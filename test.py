@@ -1,5 +1,2 @@
-a = [1,2,3,4,5]
-
-def my_function(fname):
-    print(a)
-my_function("aa")
+file1 = open('output.txt', 'w')
+file1.write("aaaaaaaaaaaaaaa")
