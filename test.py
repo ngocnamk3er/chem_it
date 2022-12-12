@@ -1,2 +1,3 @@
-file1 = open('output.txt', 'w')
-file1.write("aaaaaaaaaaaaaaa")
+import numpy
+x = 1312.1430
+print(numpy.float16((numpy.exp(x)+numpy.exp(-x)))/2)
