@@ -11,6 +11,9 @@ ai1,ai2,ai3,bi1,bi2,bi3,xi1,xi2,xi3 = ( 0 for i in range(9))
 
 # khai báo các hàm
 def partif(t, q, nira, dira, air, nirb, dirb, bir, qx):
+    global fvx,fva,fvb,na,nb,nx,nirx,fvxir,dirx,virx
+    global h,r,an,rt,wa,wb,ea
+    global ai1,ai2,ai3,bi1,bi2,bi3,xi1,xi2,xi3,xir
     cir = 0
     cf3 = 0
     ct=3.11985E-04
@@ -30,7 +33,7 @@ def partif(t, q, nira, dira, air, nirb, dirb, bir, qx):
     qrb = 1.0
     qvx = 1.0
 
-    for i in range(1,na+1):
+    for i in range(0,int(na)):
         qva = qva / (1.0 - math.exp(-h*fva[i]/rt))
     if(ai1<=0):
         qra = cr*math.sqrt(ai3*ai2)*t 
@@ -39,12 +42,12 @@ def partif(t, q, nira, dira, air, nirb, dirb, bir, qx):
     if nb != 0:
         for i in range(1, nb+1):
             qvb = qvb/(1.0 - math.exp(-h*fvb[i]/rt))
-    if bi3<= 0:
-        qrb = cr * math.sqrt(bi1 * bi2) * t
-    else:  
-        qrb =  crp * math.sqrt(bi1*bi2*bi3)*t**1.5
-    for i in range(1,nx+1):
-        qvx = qvx/(1.0-math.sqrt(-h*fvx[i]/rt))
+        if bi3<= 0:
+            qrb = cr * math.sqrt(bi1 * bi2) * t
+        else:  
+            qrb =  crp * math.sqrt(bi1*bi2*bi3)*t**1.5
+    for i in range(0,int(nx)):
+        qvx = qvx/(1.0-math.exp(-h*fvx[i]/rt))
     q = qtx/(qta*qtb)*qrx/(qra*qrb)*qvx/(qva*qvb)
     cir = 0.279321
     if(nirx != 0):
@@ -75,8 +78,8 @@ def partif(t, q, nira, dira, air, nirb, dirb, bir, qx):
     return qx
 
 def eckart(t, e0, e1, vimag, qtun):
+        global emin,gamma,v1,v22,delta,rt  
         emax = 0
-
         h = 9.5377077e-14
         r = 1.9872e-3
         cl = 2.99792e10
@@ -85,7 +88,7 @@ def eckart(t, e0, e1, vimag, qtun):
         freq =cl*vimag
         v1 = e0-e1
         v22 = math.sqrt(e1)+math.sqrt(e0)
-
+        # print(freq)
         gamma = 2*math.sqrt(e0*e1)/(h*freq)
         print(gamma)
         if gamma < 0.5:
@@ -105,17 +108,21 @@ def eckart(t, e0, e1, vimag, qtun):
         x = 2*math.pi*(alfa+beta)
         y = 2*math.pi*(alfa-beta)
         z = 2*math.pi*delta
-        print(x,-x)
-        c = (np.exp(x) + np.exp(-x))/2
-        d = (np.exp(y) + np.exp(-y))/2
-        e = (np.exp(z) + np.exp(-z))/2
+        # print(x,-x)
+        # c = (np.exp(x) + np.exp(-x))/2
+        # d = (np.exp(y) + np.exp(-y))/2
+        # e = (np.exp(z) + np.exp(-z))/2
+
+        c = 5
+        d = 5
+        e = 5
 
         edg = (c-d)/2
         edg = edg/(c+e)
         edg = edg*math.exp((e0 - emax)/rt)/rt
 
         sum1 = 0
-        sum1 = total(n-1, st, e0, sum1)
+        sum1 = total(n-1,st,  st, e0, sum1)
         sum1 = sum1 + edg
         x0 = st/2
 
@@ -136,19 +143,29 @@ def eckart(t, e0, e1, vimag, qtun):
 
 
 def total(n, x0, st, e0, sum):
+    global emin,gamma,v1,v22,delta,rt
     sum = 0
     e = emin + x0
+    print ('gamma,e,v1,v22-----------')
+    print (gamma,e,v1,v22)
+    print ('e,v1------------')
     for i in range(1,n+1):
         alfa=gamma + math.sqrt(e)/v22
         beta=gamma + math.sqrt(e-v1)/v22
+        # print(alfa,beta)
+        # test.write('gamma,e,v1,v22,alfa,betaa-------------\n')
+        # test.write(str(gamma)+"-"+str(e)+str("-")+str(v1)+"-"+str(v22)+"-"+str(alfa)+"-"+str(beta)+"\n")
         x1 = 2*math.pi*(alfa+beta)
         y1 = 2*math.pi*(alfa-beta)
         z1 = 2*math.pi*delta
-
+        # test.write('x1,y1,z1------------')
+        # test.write(str(x1)+"---"+str(y1)+"----"+str(z1)+"----"+'\n')
+        x1 = x1/10
+        y1 = y1/10
+        z1 = z1/10
         c1 = (math.exp(x1)+math.exp(-x1))/2 # số lớn quá ko tính đc nhưng fortran vẫn tính đc ????
         d1 = (math.exp(y1)+math.exp(-y1))/2
         f1 = (math.exp(z1)+math.exp(-z1))/2
-
         s = (c1 - d1)/(c1+f1)
         s = s*math.exp((e0 - e)/rt)/rt
         sum = sum + s
@@ -257,6 +274,7 @@ if __name__ == "__main__":
 
         # writing to file
         file1 = open('output.txt', 'w')
+        test = open('test.txt', 'w')
         file1.writelines(L)
         # file1.close()
 
