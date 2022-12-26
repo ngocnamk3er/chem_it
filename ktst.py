@@ -303,10 +303,10 @@ if __name__ == "__main__":
             rkcal = dl * (2.083E10) * t * q * math.exp(-ea/rt) *qtun * qhr
             # print("dl:"+str(dl)+"   t:"+str(t)+"   q:"+str(q)+"   ea:"+str(ea)+"   rt:"+str(rt)+"   qtun:"+str(qtun)+"   qhr:"+str(qhr))
             rkcal2 = rkcal / 6.022E+23
-            print(rkcal,rkcal2)
+            print(str(rkcal),str(rkcal2))
             # print(str(T)+"---"+str(rkcal)+"---"+str(rkcal2)+"---"+str(qtun))
             
             space = "                    "
             # file1.writelines("\n"+str(T)+space+str(rkcal)+space+str(rkcal2)+space+str(qtun)+"\n")
-            file1.writelines("\n%10.4f%20.4f%30.4f%30.4f\n" % (t, rkcal, rkcal2, qtun))
+            file1.writelines("\n%10.4f-----" %(t) +str(rkcal)+"------------"+str(rkcal2)+"---------%30.4f\n" % (qtun))
             
