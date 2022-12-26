@@ -1,7 +1,6 @@
 import math
 import numpy as np
 emin, gamma, v1, v22, delta, rt = (0 for i in range(0, 6)) # /eint/
-
 fva, fvb, fvx, air, dira = ([] for i in range(5)) #/FVS/
 bir, dirb, xir, dirx, fvxir, virx =  ([] for i in range(6)) #  /HRA/
 na, nb, nx, nirx = ( 0 for i in range(4))
@@ -27,7 +26,7 @@ def partif(t, q, nira, dira, air, nirb, dirb, bir, qx):
     if xi3<=0:
         qtx = cr * math.sqrt(xi1*xi2)*t
     else:
-        qrx = crp * math.sqrt(xi1*xi2*xi3)**1.5
+        qrx = crp * math.sqrt(xi1*xi2*xi3)*t**1.5
     qva = 1.0
     qvb = 1.0
     qrb = 1.0
@@ -51,7 +50,7 @@ def partif(t, q, nira, dira, air, nirb, dirb, bir, qx):
     q = qtx/(qta*qtb)*qrx/(qra*qrb)*qvx/(qva*qvb)
     cir = 0.279321
     if(nirx != 0):
-        for i in range(1,nirx + 1):
+        for i in range(0,nirx):
             qx = cir * math.sqrt(xir[i]*t)/dirx[i]
             if fvxir[i] <= 0:
                 virx[i] = 0
@@ -66,16 +65,16 @@ def partif(t, q, nira, dira, air, nirb, dirb, bir, qx):
             q = q*qx*cf
     
     if(nira != 0):
-        for i in range(1,nira+1):
+        for i in range(0,nira):
             qa = (cir*(math.sqrt(air[i]*t))/dira[i])
             q = q/qa
     
     if nirb != 0:
-        for i in range(1,nirb+1):
+        for i in range(0,nirb):
             qb = (cir*(math.sqrt(bir[i]*t))/dirb[i])
             q = q / qb
     
-    return qx
+    return [q,qx]
 
 def eckart(t, e0, e1, vimag, qtun):
         global emin,gamma,v1,v22,delta,rt  
@@ -90,7 +89,7 @@ def eckart(t, e0, e1, vimag, qtun):
         v22 = math.sqrt(e1)+math.sqrt(e0)
         # print(freq)
         gamma = 2*math.sqrt(e0*e1)/(h*freq)
-        print(gamma)
+        # print(gamma)
         if gamma < 0.5:
             print("    E1*E0 IS TOO SMALL. THE PROGRAM WILL STOP")
             exit()
@@ -113,46 +112,48 @@ def eckart(t, e0, e1, vimag, qtun):
         # d = (np.exp(y) + np.exp(-y))/2
         # e = (np.exp(z) + np.exp(-z))/2
 
-        c = 5
-        d = 5
-        e = 5
+        c = 2
+        d = 2
+        e = 2
 
         edg = (c-d)/2
         edg = edg/(c+e)
         edg = edg*math.exp((e0 - emax)/rt)/rt
 
         sum1 = 0
-        sum1 = total(n-1,st,  st, e0, sum1)
-        sum1 = sum1 + edg
-        x0 = st/2
-
-        sum2 = 0
-
-        check  = 0
+        # print(n-1)
+        check = 0
         while check == 0:
+            sum1 = total(n-1,st,  st, e0, sum1)
+            # print(n-1, st,st,e0,sum1)
+            # print("eckart")
+            sum1 = sum1 + edg
+            x0 = st/2
+            sum2 = 0
             sum2 = total(n, x0, st, e0, sum2)
             sum2 = sum2 + sum1
             n = n*2
             st = (emax - emin)/n
             x0 = st/2
-            if (abs((sum2*st-sum1*2*st)/3) >= EPSIL):
+            if (abs((sum2*st-sum1*2*st)/3) <= EPSIL):
+                break
+            else:
                 sum1 = sum2
-                check = 1
+        # print("end eckart")
         qtun = sum2 * st
         return qtun
 
 
-def total(n, x0, st, e0, sum):
+def total(n, x0, st, e0, sum):# kha nang cao loi o ham nay
     global emin,gamma,v1,v22,delta,rt
     sum = 0
     e = emin + x0
-    print ('gamma,e,v1,v22-----------')
-    print (gamma,e,v1,v22)
-    print ('e,v1------------')
-    for i in range(1,n+1):
-        alfa=gamma + math.sqrt(e)/v22
-        beta=gamma + math.sqrt(e-v1)/v22
-        # print(alfa,beta)
+    # print ('gamma,e,v1,v22-----------')
+    # print (gamma,e,v1,v22,delta)
+    # print ('e,v1------------')
+    for i in range(0,n):
+        alfa=gamma*math.sqrt(e)/v22
+        beta=gamma*math.sqrt(e-v1)/v22
         # test.write('gamma,e,v1,v22,alfa,betaa-------------\n')
         # test.write(str(gamma)+"-"+str(e)+str("-")+str(v1)+"-"+str(v22)+"-"+str(alfa)+"-"+str(beta)+"\n")
         x1 = 2*math.pi*(alfa+beta)
@@ -163,6 +164,7 @@ def total(n, x0, st, e0, sum):
         x1 = x1/10
         y1 = y1/10
         z1 = z1/10
+        # print(x1,y1,z1)
         c1 = (math.exp(x1)+math.exp(-x1))/2 # số lớn quá ko tính đc nhưng fortran vẫn tính đc ????
         d1 = (math.exp(y1)+math.exp(-y1))/2
         f1 = (math.exp(z1)+math.exp(-z1))/2
@@ -196,7 +198,6 @@ if __name__ == "__main__":
     r=1.9872E-03
 
     Title = inputArr[0]
-
     na,nb,nx = list(map(float, inputArr[2].split(',')))
 
     dgn = (list(map(float, inputArr[4].split(','))))[0]
@@ -219,7 +220,7 @@ if __name__ == "__main__":
 
         ea,eaa = list(map(float, inputArr[20].split(',')))
 
-        nirx,a,nirb = list(map(float, inputArr[22].split(',')))
+        nirx,nira,nirb = list(map(float, inputArr[22].split(',')))
 
         if nirx != 0 :
             xir = (list(map(float, inputArr[23].split(','))))
@@ -287,7 +288,7 @@ if __name__ == "__main__":
         for i in range(1,k+1):
 
             t = list(map(float, inputArr[29+i].split(',')))[0]
-            print(t)
+            # print(t)
             if t <=0 :
                 print("Go to # đọc dữ liệu từ file input.txt")
             rt = r*t
@@ -295,10 +296,14 @@ if __name__ == "__main__":
             if vimag <= 0:
                 qtun = 1.0
             qtun = eckart(t, ea,eaa,vimag,qtun)
+            # print("t:"+str(t)+"   ea:"+str(ea)+"   eaa:"+str(eaa)+"   vimag:"+str(vimag)+"   qtun:"+str(qtun))
+            print("")
             t1 = t
-            qx = partif(t1,q,nira,dira,air,nirb,dirb,bir,qx)
-            rkcal = dl * (2.083E10) * t * q * math.exp(-ea/rt) * qhr
+            q,qx = partif(t1,q,nira,dira,air,nirb,dirb,bir,qx)
+            rkcal = dl * (2.083E10) * t * q * math.exp(-ea/rt) *qtun * qhr
+            # print("dl:"+str(dl)+"   t:"+str(t)+"   q:"+str(q)+"   ea:"+str(ea)+"   rt:"+str(rt)+"   qtun:"+str(qtun)+"   qhr:"+str(qhr))
             rkcal2 = rkcal / 6.022E+23
+            print(rkcal,rkcal2)
             # print(str(T)+"---"+str(rkcal)+"---"+str(rkcal2)+"---"+str(qtun))
             
             space = "                    "

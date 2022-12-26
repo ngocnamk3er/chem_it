@@ -1,3 +1,13 @@
-import numpy
-x = 1312.1430
-print(numpy.float16((numpy.exp(x)+numpy.exp(-x)))/2)
+x = 1
+def func():
+  a = 1
+  b = 2
+  return [a,b]
+if __name__ == "__main__":
+  x = 1
+  k = 0
+  while x ==  1:
+    k = k+1
+    if k == 10:
+        break
+    print(123) 
