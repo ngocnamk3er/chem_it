@@ -111,11 +111,11 @@ def eckart(t, e0, e1, vimag, qtun):
         # c = (np.exp(x) + np.exp(-x))/2
         # d = (np.exp(y) + np.exp(-y))/2
         # e = (np.exp(z) + np.exp(-z))/2
-
+        #ko ảnh hưởng đến kết quả
         c = 2
         d = 2
         e = 2
-
+        #ko ảnh hưởng đến kết quả
         edg = (c-d)/2
         edg = edg/(c+e)
         edg = edg*math.exp((e0 - emax)/rt)/rt
