@@ -199,7 +199,37 @@ def GIBBS (NT,TEMP,NN,SPECIES,WT,G0,G1,EE,BE,AE,WE,WEX,SN,SF,A,B,C,F,NF,W,NV,DGT
     PI=numpy.arccos(-1.0)
     if (RES == "atm"): TC = -3.664854875
     if (RES == "bar") : TC = -3.651691889
+    II = 1
+    while (II <= NT):
+        T = TEMP(II)
+        if (EE == 0): CELECT = numpy.log(G0)
+        if (EE != 0): CELECT = numpy.log(G0 + G1*numpy.exp(C1*EE/T))
         
+        CTRANS = 1.5*numpy.log(WT) + 2.5*numpy.log(T) + TC
+        
+        if(SPECIES == "monatomic "): G = (CELECT + CTRANS)*R*T
+        if(SPECIES == "monatomic "): E0 = 0
+        
+        if(SPECIES == "diatomic  "):
+            Y=C1*(BE-AE/2)/T
+            U=C1*(WE-2*WEX)/T
+            XE=WEX/WE
+            D=AE/BE
+            GG=BE/WE
+            if(U > 80):
+                EU = numpy.exp(80)
+                U1 = 0
+            else:
+                EU = numpy.exp(U) - 1
+                U1 = U/EU/EU
+            if(ZPE != "yes"): E0 = 0
+            if(ZPE == "yes"): E0 = -U/2
+            G= CTRANS  - numpy.log(SN*Y) + Y/3 + Y**2/90 - numpy.log(1-numpy.exp(-U)) + CELECT + E0 + (2*XE*U1) + D/EU + 8*GG/U
+            G = G*R*T
+            E0= E0*R*T
+        E0   = 0
+        CVIB = 0
+        # dang code den dong 350 o fortran
 #end gibbs
 def main():
     print('main')
