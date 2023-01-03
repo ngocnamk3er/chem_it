@@ -7,6 +7,8 @@ class stage:
         self.w = w
         self.time = time
         self.nextstage = list()
+    def __lt__(self, other):
+         return self.time < other.time
 
 ra = stage("ra",0.0,1)
 comp1 = stage("comp1",-13.1,2)
@@ -79,21 +81,29 @@ visited = dict()
 
 listLabel = list()
 listW = list()
+listStage = list()
 
-
-def dfs_tree(root_stage,listLabel,listW):
-    listLabel.append(root_stage.label)
-    listW.append(root_stage.w)
+def dfs_tree(root_stage,listStage):
+    listStage.append(root_stage)
     if (len(root_stage.nextstage)==0):
-        # plt.xticks(np.array(listTime),np.array(listLabel))
+        listLabel = list()
+        listW = list()
+        listTime = list()
+        listStage.sort()
+        for stage in listStage:
+            listLabel.append(stage.label)
+            listW.append(stage.w)
+            listTime.append(stage.time)
+        print(listLabel)
+        print(listW)
+        print(listTime)
         plt.plot(np.array(listLabel),np.array(listW))
-        # plt.show()
+        plt.show()
     for i in root_stage.nextstage:
         # if i.label not in visited:
         #     visited[i.label] = 1
-            dfs_tree(i,listLabel,listW)
-            listLabel.pop()
-            listW.pop()
+            dfs_tree(i,listStage)
+            listStage.pop()
         # else:
         #     print(i.label, "is already visited")
 
@@ -103,14 +113,27 @@ def show_graph(root_stage):
 
 
 def main(): 
-    dfs_tree(ra,listLabel,listW)
-    plt.show()
+    dfs_tree(ra,listStage)
+    # plt.show()
 
 if __name__ == "__main__":
+    # x1 = stage("ra",1,1)
+    # x2 = stage("ra",2,2)
+    # x3 = stage("ra",3,3)
+    # x = list()
+    # x.append(x2)
+    # x.append(x3)
+    # x.append(x1)
+    # x.sort()
+    # for i in x:
+    #     print(i.label, i.w)
     main()
     # x = np.array([4,1,2,3])
-    # y = np.array([20,21,22,23])
+    # y = np.array([10,20,40,80])
     # my_xticks = ['John','Arnold','Mavis','Matt']
     # plt.xticks(x, my_xticks)
     # plt.plot(x, y)
     # plt.show()
+    # ax = plt.gca()
+    # line = ax.lines[0]
+    # print(line.get_xydata())
