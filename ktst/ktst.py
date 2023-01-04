@@ -309,4 +309,3 @@ if __name__ == "__main__":
             space = "                    "
             # file1.writelines("\n"+str(T)+space+str(rkcal)+space+str(rkcal2)+space+str(qtun)+"\n")
             file1.writelines("\n%10.4f-----" %(t) +str(rkcal)+"------------"+str(rkcal2)+"---------%30.4f\n" % (qtun))
-            
