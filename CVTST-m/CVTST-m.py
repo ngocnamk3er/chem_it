@@ -210,10 +210,10 @@ def GIBBS (NT,TEMP,NN,SPECIES,WT,G0,G1,EE,BE,AE,WE,WEX,SN,SF,A,B,C,F,NF,W,NV,DGT
         
         CTRANS = 1.5*numpy.log(WT) + 2.5*numpy.log(T) + TC
         
-        if(SPECIES == "monatomic "): G = (CELECT + CTRANS)*R*T
-        if(SPECIES == "monatomic "): E0 = 0
+        if(SPECIES == "monatomic"): G = (CELECT + CTRANS)*R*T
+        if(SPECIES == "monatomic"): E0 = 0
         #Diatomic Species    
-        if(SPECIES == "diatomic  "):
+        if(SPECIES == "diatomic"):
             Y=C1*(BE-AE/2)/T
             U=C1*(WE-2*WEX)/T
             XE=WEX/WE
@@ -234,7 +234,7 @@ def GIBBS (NT,TEMP,NN,SPECIES,WT,G0,G1,EE,BE,AE,WE,WEX,SN,SF,A,B,C,F,NF,W,NV,DGT
         #Polyatomic Species        
         E0   = 0
         CVIB = 0
-        for i in range (1,NV+1):
+        for I in range (1,NV+1):
             V[I] = C1*W[I]/T
             if (ZPE == "yes"):
                 E0 = E0 -V[I]/2
@@ -276,187 +276,187 @@ def GIBBS (NT,TEMP,NN,SPECIES,WT,G0,G1,EE,BE,AE,WE,WEX,SN,SF,A,B,C,F,NF,W,NV,DGT
     II += 1
 #end gibbs
 def main():
-    print('main')
+    pass
 
 
 if __name__ == "__main__":
-    # đọc dữ liệu từ file bimo.inp và lưu vào mảng inputArr
-    inputArr = []
-    file1 = open('bimo.inp', 'r')
-    Lines = file1.readlines()
-    for line in Lines:
-        inputArr.append(line.strip())
+    main()
+    # inputArr = []
+    # file1 = open('bimo.inp', 'r')
+    # Lines = file1.readlines()
+    # for line in Lines:
+    #     inputArr.append(line.strip())
      
-    #Gán giá trị các biến 
-    Title = inputArr[0]
-    NP = int(inputArr[1][29:32])
-    NR = int(inputArr[2][22:25])
-    Title = inputArr[3]
-    NN = 0
-    for i in range (1,9):
-        M[i]= list(map(int, inputArr[4].split('  ')))
-        NN += M[i]
-    NT = int(inputArr[5][25:28])
-    ZPE = bool(inputArr[6][27:30])
-    TUN = bool(inputArr[7][31:33])
-    Title = inputArr[8]
-    RES = "bar"
-    ASK = bool(inputArr[9][24:27])
-    if(ASK == "yes"):
-        RES = "atm"
-    ASK = bool(inputArr[10][17:19])
-    if(ASK == "yes"):
-        RES = "bar"
+    # #Gán giá trị các biến 
+    # Title = inputArr[0]
+    # NP = int(inputArr[1][29:32])
+    # NR = int(inputArr[2][22:25])
+    # Title = inputArr[3]
+    # NN = 0
+    # for i in range (1,9):
+    #     M[i]= list(map(int, inputArr[4].split('  ')))
+    #     NN += M[i]
+    # NT = int(inputArr[5][25:28])
+    # ZPE = bool(inputArr[6][27:30])
+    # TUN = bool(inputArr[7][31:33])
+    # Title = inputArr[8]
+    # RES = "bar"
+    # ASK = bool(inputArr[9][24:27])
+    # if(ASK == "yes"):
+    #     RES = "atm"
+    # ASK = bool(inputArr[10][17:19])
+    # if(ASK == "yes"):
+    #     RES = "bar"
     
-    #CONSTANTS
-    FAC = 0.46499834
-    R = 1.9872
-    RCC1 = 2.08367541593
-    if(RES == "atm"):
-        RCC2= 1.3626055
-    if(RES=="bar"):
-        RCC2=1.38066
-    RCC = RCC1 * numpy.pow(RCC2,(NN-1))
-    C1 = 1.438767553
+    # #CONSTANTS
+    # FAC = 0.46499834
+    # R = 1.9872
+    # RCC1 = 2.08367541593
+    # if(RES == "atm"):
+    #     RCC2= 1.3626055
+    # if(RES=="bar"):
+    #     RCC2=1.38066
+    # RCC = RCC1 * numpy.pow(RCC2,(NN-1))
+    # C1 = 1.438767553
     
-    #Read Temperatures
+    # #Read Temperatures
     
-    for i in range(1,NT+1):
-        TEMP[i]= list(map(int, inputArr[i+11].split('.')))
+    # for i in range(1,NT+1):
+    #     TEMP[i]= list(map(int, inputArr[i+11].split('.')))
         
-    #Loop over structures
-    for L in range(1,NP+1):
-        GEO[L],E[L],SPECIES = list(map(float, inputArr[36].split('   ')))
-        E[L] = E[L]*627.50595E0
-        file1.writelines(GEO(L), E(L)/627.50595, SPECIES, '\n')
-        BE = 0.0
-        AE = 0.0
-        WE = 0.0
-        WEX = 0.0
-        if (SPECIES == "diatomic"):
-        # READ(10,*) WT,G0,G1,EE
-        # READ(10,*) BE,AE,WE,WEX
-            WT,G0,G1,EE,BE,AE,WE,WEX = list(map(float, inputArr[38].split(' ')))
-        else:
-        # READ(10,*) WT,G0,G1,EE
-        # READ(10,*) A,B,C,SN,SF,F,NF,NV
-            WT,G0,G1,EE = list(map(float, inputArr[37].split('    '))) 
-        A,B,C,SN,SF,F,NF,NV = list(map(float, inputArr[38].split('')))
-        A = A * FAC
-        B = B * FAC
-        C = C * FAC
-        F = F * FAC
-        #IF(NV.NE.0) READ(10,*)(W(j),j=1,NV)
-        #IF(TUN.EQ."yes") READ(10,*) RCV(L)
-        if(NV!=0):
-            for j in range (1,NV+1):
-                W[j]=list(map(float, inputArr[39].split('               ')))
-        GIBBS (NT,TEMP,L,SPECIES,WT,G0,G1,EE,BE,AE,WE,WEX,SN,SF,A,B,C,F,NF,W,NV,DGT,E[L],RES,ZPE,EZ)
-    # Ghi ra file 
-    file1 = open('bimo.out', 'w')
-    file1.writelines(L)    
+    # #Loop over structures
+    # for L in range(1,NP+1):
+    #     GEO[L],E[L],SPECIES = list(map(float, inputArr[36].split('   ')))
+    #     E[L] = E[L]*627.50595E0
+    #     file1.writelines(GEO(L), E(L)/627.50595, SPECIES, '\n')
+    #     BE = 0.0
+    #     AE = 0.0
+    #     WE = 0.0
+    #     WEX = 0.0
+    #     if (SPECIES == "diatomic"):
+    #     # READ(10,*) WT,G0,G1,EE
+    #     # READ(10,*) BE,AE,WE,WEX
+    #         WT,G0,G1,EE,BE,AE,WE,WEX = list(map(float, inputArr[38].split(' ')))
+    #     else:
+    #     # READ(10,*) WT,G0,G1,EE
+    #     # READ(10,*) A,B,C,SN,SF,F,NF,NV
+    #         WT,G0,G1,EE = list(map(float, inputArr[37].split('    '))) 
+    #     A,B,C,SN,SF,F,NF,NV = list(map(float, inputArr[38].split('')))
+    #     A = A * FAC
+    #     B = B * FAC
+    #     C = C * FAC
+    #     F = F * FAC
+    #     #IF(NV.NE.0) READ(10,*)(W(j),j=1,NV)
+    #     #IF(TUN.EQ."yes") READ(10,*) RCV(L)
+    #     if(NV!=0):
+    #         for j in range (1,NV+1):
+    #             W[j]=list(map(float, inputArr[39].split('               ')))
+    #     GIBBS (NT,TEMP,L,SPECIES,WT,G0,G1,EE,BE,AE,WE,WEX,SN,SF,A,B,C,F,NF,W,NV,DGT,E[L],RES,ZPE,EZ)
+    # # Ghi ra file 
+    # file1 = open('bimo.out', 'w')
+    # file1.writelines(L)    
     
-    #List "Delta G"
-    if(NR > 1):
-        for J in range(1,NT+1):
-            DGT[NR,J]= M[NR]*DGT[NR,J]
-        EZ[NR]=M[NR]*EZ[NR]
-        for I in range(1,NR):
-            EZ[NR]=EZ[NR]+M[I]*EZ[I]
-            for J in range(1,NT+1):
-                DGT[NR,J]=DGT[NR,J]+M[I]*DGT[I,J]
-    file1.writelines()
-    for I in range(NR,NP+1):
-        file1.writelines(GEO[I])
-    #Save Geometric 
-    for I in range(1,NT+1):
-        #WRITE(11,102) TEMP(I) 
-        GDAT[I] = -10.0
-        for J in range(NR,NP+1):
-            DD=DGT[J,I]-DGT[NR,I]
-            GG[J]=DD
-            if(DD>GDAT[I]):
-                GDAT[I]=DD
-                if(TUN=="yes"):
-                    TV[I]=RCV(J)
-                else: TV[I]=0
-                EZT[I]=EZ[J]-EZ[NR]
-            GEOM[I]=GEO[J]
-        #Do dG/dR (Central Difference)
-        for J in range(NR,NP+1):
-            if(J==NR or J==NP):
-                file1.writelines(GEO[J],GG[J])
-            else:
-                dGdRA = (GG[J+1]-GG[J])/(GEO[J+1]-GEO[J])
-                dGdRB = (GG[J]-GG[J-1])/(GEO[J]-GEO[J-1])
-                dGdR[J]=(dGdRA+dGdRB)/2
-                file1.writelines(GEO[J],GG[J],dGdR[J])
-                # WRITE(11,"(F15.4, F15.6, F15.6)") GEO(J), GG(J), dGdR(J)
-    #WRITE(11,"(1X)") 
-    #WRITE(11,105) 
-    #WRITE(11,106) 
-    #WRITE(11,107)'
-    for I in range(1,NT+1):
-        file1.writelines(TEMP[I], GEOM[I],GDAT[I])
-    # DO quadratic least
-    for I in range(1,NT+1):
-        AA[I]= TEMP[I]*TEMP[I]
-        AA[I+NT]=TEMP[I]
-        AA[I+(2*NT)]=1.0
-        BB[I] = GDAT[I]
-    HOUSEFIT(AA,NT,3,BB,NT,1,X,WW,ISING)
-    #WRITE(11,"(1X)") 
-	#WRITE(11,108) 
-    #WRITE(11,109)
-    for I in range(1,NT+1):
-        PRED = X[1]*TEMP[I]*TEMP[I]+X[2]*TEMP[I]+X[3]
-        file1.writelines(TEMP[I],PRED)
-    X[1]=X[1]*1000.0
-    X[2]=X[2]*1000.0
-    X[3]=X[3]*1000.0 
-    #WRITE(11,"(1X)") 
-    #WRITE(11,110)  X(1), X(2), X(3)
-    #WRITE(11,"(1X)") 
-    for I in range(1,NT):
-        #WRITE(12,"(F10.3)") TEMP(I)
-    #WRITE(12,"(1X)") 
-    #WRITE(11,"(1X)") 
-    #WRITE(11,111) 
-    #WRITE(11,"(1X)") 
-    #WRITE(11,112) RCC, NN, NN-1
-    #WRITE(11,"(1X)") 
-    #WRITE(11,113)
-    #WRITE(11,"(1X)") 
+    # #List "Delta G"
+    # if(NR > 1):
+    #     for J in range(1,NT+1):
+    #         DGT[NR,J]= M[NR]*DGT[NR,J]
+    #     EZ[NR]=M[NR]*EZ[NR]
+    #     for I in range(1,NR):
+    #         EZ[NR]=EZ[NR]+M[I]*EZ[I]
+    #         for J in range(1,NT+1):
+    #             DGT[NR,J]=DGT[NR,J]+M[I]*DGT[I,J]
+    # file1.writelines()
+    # for I in range(NR,NP+1):
+    #     file1.writelines(GEO[I])
+    # #Save Geometric 
+    # for I in range(1,NT+1):
+    #     #WRITE(11,102) TEMP(I) 
+    #     GDAT[I] = -10.0
+    #     for J in range(NR,NP+1):
+    #         DD=DGT[J,I]-DGT[NR,I]
+    #         GG[J]=DD
+    #         if(DD>GDAT[I]):
+    #             GDAT[I]=DD
+    #             if(TUN=="yes"):
+    #                 TV[I]=RCV(J)
+    #             else: TV[I]=0
+    #             EZT[I]=EZ[J]-EZ[NR]
+    #         GEOM[I]=GEO[J]
+    #     #Do dG/dR (Central Difference)
+    #     for J in range(NR,NP+1):
+    #         if(J==NR or J==NP):
+    #             file1.writelines(GEO[J],GG[J])
+    #         else:
+    #             dGdRA = (GG[J+1]-GG[J])/(GEO[J+1]-GEO[J])
+    #             dGdRB = (GG[J]-GG[J-1])/(GEO[J]-GEO[J-1])
+    #             dGdR[J]=(dGdRA+dGdRB)/2
+    #             file1.writelines(GEO[J],GG[J],dGdR[J])
+    #             # WRITE(11,"(F15.4, F15.6, F15.6)") GEO(J), GG(J), dGdR(J)
+    # #WRITE(11,"(1X)") 
+    # #WRITE(11,105) 
+    # #WRITE(11,106) 
+    # #WRITE(11,107)'
+    # for I in range(1,NT+1):
+    #     file1.writelines(TEMP[I], GEOM[I],GDAT[I])
+    # # DO quadratic least
+    # for I in range(1,NT+1):
+    #     AA[I]= TEMP[I]*TEMP[I]
+    #     AA[I+NT]=TEMP[I]
+    #     AA[I+(2*NT)]=1.0
+    #     BB[I] = GDAT[I]
+    # HOUSEFIT(AA,NT,3,BB,NT,1,X,WW,ISING)
+    # #WRITE(11,"(1X)") 
+	# #WRITE(11,108) 
+    # #WRITE(11,109)
+    # for I in range(1,NT+1):
+    #     PRED = X[1]*TEMP[I]*TEMP[I]+X[2]*TEMP[I]+X[3]
+    #     file1.writelines(TEMP[I],PRED)
+    # X[1]=X[1]*1000.0
+    # X[2]=X[2]*1000.0
+    # X[3]=X[3]*1000.0 
+    # #WRITE(11,"(1X)") 
+    # #WRITE(11,110)  X(1), X(2), X(3)
+    # #WRITE(11,"(1X)") 
+    # for I in range(1,NT):
+    #     #WRITE(12,"(F10.3)") TEMP(I)
+    # #WRITE(12,"(1X)") 
+    # #WRITE(11,"(1X)") 
+    # #WRITE(11,111) 
+    # #WRITE(11,"(1X)") 
+    # #WRITE(11,112) RCC, NN, NN-1
+    # #WRITE(11,"(1X)") 
+    # #WRITE(11,113)
+    # #WRITE(11,"(1X)") 
     
-    for I in range(1,NT+1):
-        PRED = X[1]*TEMP[I]*TEMP[I]+X[2]*TEMP[I]+X[3]
-        FRC = RCC * numpy.pow(TEMP[I],NN) * numpy.exp(-PRED/(R*TEMP[I]))
-        RRC = RCC * numpy.pow(TEMP[I],NN) * numpy.exp(-GDAT[I]*1000.0/(R*TEMP[I]))
-        #WRITE(11,114) TEMP(I), RRC, FRC
-        #WRITE(12,"(E12.6)") RRC
-    if(TUN != "yes"):
-        #CLOSE (UNIT=10)
-        #CLOSE (UNIT=11)
-    else:
-       #WRITE(11,"(1X)") 
-      #WRITE(12,"(1X)") 
-      #WRITE(11,"(49x)") 'where w(cm^-1) = negative frequency (along path))'
-      #WRITE(11,"(48x)") 'Note: This factor only valid for small barriers)'
-      #WRITE(11,"(47x)") 'with a width of less than about 1.8 Angstroms.)'
-      #WRITE(11,"(1X)") 
-      #WRITE(11,"(33x)") 'Rates with Tunneling Correction:)'
-      #WRITE(11,"(1X)") 
-    for I in range(1,NT+1):
-            PRED = X[1]*TEMP[I]*TEMP[I]+X[2]*TEMP[I]+X[3]
-            FRC = RCC * numpy.pow(TEMP[I],NN) * numpy.exp(-PRED/(R*TEMP[I]))
-            RRC = RCC * numpy.pow(TEMP[I],NN) * numpy.exp(-GDAT[I]*1000.0/(R*TEMP[I]))
-            TF = math.pow((C1*TV[I]/TEMP[I]),2)
-            TF = TF * (1.0 + R*TEMP[I]/(EZT[I]*1000.0))/24.0
-            TF = TF + 1.0
-            RRC = TF * RRC
-            FRC = TF * FRC
-            #WRITE(11,114) TEMP(I), RRC, FRC
-            #WRITE(12,"(E12.6)") RRC
+    # for I in range(1,NT+1):
+    #     PRED = X[1]*TEMP[I]*TEMP[I]+X[2]*TEMP[I]+X[3]
+    #     FRC = RCC * numpy.pow(TEMP[I],NN) * numpy.exp(-PRED/(R*TEMP[I]))
+    #     RRC = RCC * numpy.pow(TEMP[I],NN) * numpy.exp(-GDAT[I]*1000.0/(R*TEMP[I]))
+    #     #WRITE(11,114) TEMP(I), RRC, FRC
+    #     #WRITE(12,"(E12.6)") RRC
+    # if(TUN != "yes"):
+    #     #CLOSE (UNIT=10)
+    #     #CLOSE (UNIT=11)
+    # else:
+    #    #WRITE(11,"(1X)") 
+    #   #WRITE(12,"(1X)") 
+    #   #WRITE(11,"(49x)") 'where w(cm^-1) = negative frequency (along path))'
+    #   #WRITE(11,"(48x)") 'Note: This factor only valid for small barriers)'
+    #   #WRITE(11,"(47x)") 'with a width of less than about 1.8 Angstroms.)'
+    #   #WRITE(11,"(1X)") 
+    #   #WRITE(11,"(33x)") 'Rates with Tunneling Correction:)'
+    #   #WRITE(11,"(1X)") 
+    # for I in range(1,NT+1):
+    #         PRED = X[1]*TEMP[I]*TEMP[I]+X[2]*TEMP[I]+X[3]
+    #         FRC = RCC * numpy.pow(TEMP[I],NN) * numpy.exp(-PRED/(R*TEMP[I]))
+    #         RRC = RCC * numpy.pow(TEMP[I],NN) * numpy.exp(-GDAT[I]*1000.0/(R*TEMP[I]))
+    #         TF = math.pow((C1*TV[I]/TEMP[I]),2)
+    #         TF = TF * (1.0 + R*TEMP[I]/(EZT[I]*1000.0))/24.0
+    #         TF = TF + 1.0
+    #         RRC = TF * RRC
+    #         FRC = TF * FRC
+    #         #WRITE(11,114) TEMP(I), RRC, FRC
+    #         #WRITE(12,"(E12.6)") RRC
           
         
     
