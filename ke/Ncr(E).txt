@@ -1,0 +1,36 @@
+
+
+
+Calculating the integrated density of states Ncr(E) ...
+Iter. 1NMECP(E)= 0.0Grad = 1e+30
+Iter. 2NMECP(E)= 0.2528299631925466Grad = 0.2528299631925466
+
+
+
+Calculating the integrated density of states Ncr(E) ...
+Iter. 1NMECP(E)= 0.0Grad = 1e+30
+Iter. 2NMECP(E)= 0.09548276284780964Grad = 0.09548276284780964
+
+
+
+Calculating the integrated density of states Ncr(E) ...
+Iter. 1NMECP(E)= 0.0Grad = 1e+30
+Iter. 2NMECP(E)= 0.25317491653522345Grad = 0.25317491653522345
+
+
+
+Calculating the integrated density of states Ncr(E) ...
+Iter. 1NMECP(E)= 0.0Grad = 1e+30
+Iter. 2NMECP(E)= 0.24599607000562465Grad = 0.24599607000562465
+
+
+
+Calculating the integrated density of states Ncr(E) ...
+Iter. 1NMECP(E)= 0.0Grad = 1e+30
+Iter. 2NMECP(E)= 0.2526987574565364Grad = 0.2526987574565364
+
+
+
+Calculating the integrated density of states Ncr(E) ...
+Iter. 1NMECP(E)= 0.0Grad = 1e+30
+Iter. 2NMECP(E)= 0.25317491653522345Grad = 0.25317491653522345

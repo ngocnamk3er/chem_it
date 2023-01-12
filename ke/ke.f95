@@ -266,9 +266,9 @@
           fm=funcrzo(xm,eng,FREQ,NFREQ)
           s=sqrt(fm * fm - fl * fh)
           if(s==0.) return
-			a = 1.0
-			b = fl-fh
-          	xnew=xm+(xm-xl)*(sign(a,b)*fm/s)
+          a = 1.0
+          b = fl-fh
+          xnew=xm+(xm-xl)*(sign(a,b)*fm/s)
           if (abs(xnew-zriddr).le.xacc) return
           	zriddr=xnew
           	fnew=funcrzo(zriddr,eng,FREQ,NFREQ)
