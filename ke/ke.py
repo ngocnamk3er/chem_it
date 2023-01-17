@@ -1,245 +1,239 @@
 import math
 import numpy
 
+
+planck = 6.6260693e-34  # planck's constant (j * s)
+na = 6.0221415e23       # avogadro constant (mol-1)
+bohr = 0.5291772108e-10  # bohr radius (m)
+j_cm = 1.98644561e-23 	# j to cm-1 convertion factor
+
+outputfile = open('output.txt', 'w')
+energyfile = open('energy.txt', 'w')
+ncrfile = open('ncr(e).txt', 'w')
+
+
 def main():
-    Planck = 6.6260693E-34
-    NA = 6.0221415E23
-    BOHR = 0.5291772108E-10
-    J_cm = 1.98644561E-23
-    GradS = [] 
-    GradT = []
-    FREQ = []
-    FREQ_MECP = [] 
-    Energy = []
-    f = open("input.txt", "r")
-    f1 = open("output.txt", "w+")
-    f2 = open("energy.txt", "w+")
-    f3 = open("Ncr(E).txt", "w+")
-    f.readline()
-    Natoms = int(f.readline())
-    NumGrad = int(f.readline())
-    H12 = float(f.readline())
-    redmass = float(f.readline())
-    EPS = float(f.readline())
-    f.readline()
-    E_min = float(f.readline())
-    f.readline()
-    EMECP = float(f.readline())
-    f.readline()
-    Ncalc = int(f.readline())
-    f.readline()
-    i = 1
-    while (i <= Ncalc):
-        Energy.append(float(f.readline()))
-        i += 1
-    i = 1
-    f.readline()
-    while (i <= NumGrad):
-        GradS.append(float(f.readline()))
-        i += 1
-    i = 1
-    f.readline()
-    while (i <= NumGrad):
-        GradT.append(float(f.readline()))
-        i += 1
-    NFREQ = 3*Natoms - 6
-    NFREQ_MECP = 3*Natoms - 7
-    f.readline()
-    i = 1
-    while (i <= NFREQ):
-        FREQ.append(float(f.readline()))
-        i += 1
-    f.readline()
-    i = 1
-    while (i <= NFREQ_MECP):
-        FREQ_MECP.append(float(f.readline()))
-        i += 1
-    H12 = H12*11.9626/NA
-    redmass = redmass*1.66054E-27
-    deltaF = 0
-    i = 0
-    while (i < NumGrad):
-        deltaF = deltaF + (GradS[i]-GradT[i])*(GradS[i]-GradT[i])
-        i += 1
-    coef = 62750.94717E-2*1000*4.184/NA/BOHR
-    sqr = math.sqrt(deltaF)
-    deltaF = sqr*coef
-    i = 0
-    while (i < Ncalc):
-        Energy_MECP = abs(Energy[i]-EMECP)
-        Energy_Min = abs(Energy[i]-E_min)
-        f2.write('\n')
-        f2.write('Internal energy = ')
-        f2.write(str(Energy[i]))
-        f2.write(' kcal/mol')
-        f2.write('\n')
-        f2.write('Available energy above MECP = ')
-        f2.write(str(Energy_MECP))
-        f2.write(' kcal/mol')
-        f2.write('\n\n')
-        f2.write('Available energy above minima = ')
-        f2.write(str(Energy_Min))
-        f2.write(' kcal/mol')
-        f3.write('\n\n')
-        f3.write('\nCalculating the integrated density of states Ncr(E) ...\n')
-        f2.write("\n")
-        P_sh = Psh(Energy_MECP, H12, redmass, deltaF)
-        NMECP = qsimp(Energy_MECP, H12, redmass, deltaF,FREQ_MECP, NFREQ_MECP, EPS, f3)
-        RHO_REACTANT = RHO_SADDLE_POINT(Energy_Min, FREQ, NFREQ)
-        rate = NMECP/(RHO_REACTANT*(Planck/J_cm))
-        f2.write('NMECP(E) = ')
-        f2.write(str(NMECP))
-        f2.write('\n')
-        f2.write('RHO_R    = ')
-        f2.write(str(RHO_REACTANT))
-        f2.write('\n')
-        f2.write('k(E)     = ')
-        f2.write(str(rate))
-        f2.write(' s-1')
-        
-        f2.write('\n')
-        f1.write(str(Energy[i]))
-        f1.write('\n')
-        f1.write(str(rate))
-        f1.write('\n')
-        f1.write(str(P_sh))
-        f1.write('\n')
-        f1.write(str(NMECP))
-        f1.write('\n')
-        f1.write(str(RHO_REACTANT))
-        f1.write('\n\n')
-        i += 1
+    freq, freq_mecp, energy = ([] for i in range(3))
+    grads, gradt = ([] for i in range(2))
+    inputarr = []
+    file1 = open('input.txt', 'r')
+    lines = file1.readlines()
+    for line in lines:
+        inputarr.append(line.strip())
+    natoms = float(inputarr[1])
+    numgrad = float(inputarr[2])
+    h12 = float(inputarr[3])
+    redmass = float(inputarr[4])
+    eps = float(inputarr[5])
+    print("eps : ", eps)
+    e_min = float(inputarr[7])
+    emecp = float(inputarr[9])
+    ncalc = float(inputarr[11])
+    for i in range(0, int(ncalc)):
+        energy.append(float(inputarr[13+i]))
+    for i in range(0, int(numgrad)):
+        grads.append(float(inputarr[20+i]))
+    for i in range(0, int(numgrad)):
+        gradt.append(float(inputarr[28+i]))
+    nfreq = 3*natoms-6
+    nfreq_mecp = 3*natoms-7
+    for i in range(0, int(nfreq)):
+        freq.append(float(inputarr[36+i]))
+    for i in range(0, int(nfreq_mecp)):
+        freq_mecp.append(float(inputarr[40+i]))
+    print("natoms: ", natoms)
+    print("numgrad: ", numgrad)
+    print("h12: ", h12)
+    print("redmass: ", redmass)
+    print("eps: ", eps)
+    print("e_min: ", e_min)
+    print("emecp: ", emecp)
+    print("ncalc: ", ncalc)
+    print("energy: ", energy)
+    print("grads: ", grads)
+    print("gradt: ", gradt)
+    h12 = h12*11.9626/na
+    redmass = redmass*(1.66054e-27)
+    deltaf = 0
+    for i in range(0, int(numgrad)):
+        deltaf = deltaf + (grads[i]-gradt[i])*(grads[i]-gradt[i])
+    coef = 62750.94717e-2*1000*4.184/na/bohr
+    sqr = math.sqrt(deltaf)
+    deltaf = sqr*coef
+    outputfile.write('the results of k(e) are listed below\n')
+    outputfile.write('\n')
+    outputfile.write('e(internal),kcal/mol'+'----'+'k(e),s-1' +
+                     '----'+'p(sh)'+'----'+'nmecp'+'----'+'rho(reactant)\n')
+    outputfile.write('\n')
 
-    f1.write('Calculation finished!')
-    f2.write('\nCalculation finished! Open output file to get results.\n')
-    f.close()
-    f1.close()
-    f2.close()
-    f3.close()
+    for i in range(0, int(ncalc)):
+        energy_mecp = abs(energy[i]-emecp)
+        energy_min = abs(energy[i]-e_min)
+        energyfile.write("\n")
+        energyfile.write('internal energy = %f kcal/mol\n' % energy[i])
+        energyfile.write(
+            'available energy above mecp = %f kcal/mol\n' % energy_mecp)
+        energyfile.write(
+            'available energy above minima = %f kcal/mol\n' % energy_min)
+        ncrfile.write("\n")
+        ncrfile.write(
+            'calculating the integrated density of states ncr(e) ...\n')
+        energyfile.write("\n")
+        nmecp = qsimp(energy_mecp, h12, redmass, deltaf,
+                      freq_mecp, nfreq_mecp, eps)
+
+        rho_reactant = rho_saddle_point(energy_min, freq, nfreq)
+
+        rate = nmecp/(rho_reactant*(planck/j_cm))
+        p_sh = psh(energy_mecp, h12, redmass, deltaf)
+
+        energyfile.write('nmecp(e) = %f\n' % nmecp)
+        energyfile.write('rho_r    = %f\n' % rho_reactant)
+        energyfile.write('k(e)     = %f s-1\n' % rate)
+        energyfile.write("\n")
+        outputfile.write(str(energy[i])+"         "+str(rate)+"         "+str(
+            p_sh)+"         " + str(nmecp)+"         "+str(rho_reactant)+'\n')
 
 
-def qsimp(ENERGY, H12, RedMass, DeltaF, FREQ, NFREQ, EPS, f3):
-    a = 0
-    b = 0
-    ost = 0
-    Cal_cm = 349.755
+def qsimp(energy, h12, redmass, deltaf, freq, nfreq, eps):
+    # print ("qsimpxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+    # print(energy, h12, redmass, deltaf, freq, nfreq, eps)
+    jmax = 200
+    cal_cm = 349.755
+    a = 0.0
+    b = 0.0
     st = -1.e30
     os = -1.e30
-    JMAX = 200
-    maxfreq = 1000
-    d = 0
-    b1 = 0
-    i = 1
-    while (i <= JMAX):
-        if (i == 1):
-            c = 0.5*(ENERGY-a)*Psh(a, H12, RedMass, DeltaF)
-            d = RHO_SADDLE_POINT(ENERGY-a, FREQ, NFREQ)
+    ost = 0.0
+    for i in range(1, jmax+1):
+        if i == 1:
+            c = 0.5*(energy-a)*psh(a, h12, redmass, deltaf)
+            d = rho_saddle_point((energy-a), freq, nfreq)
             a1 = c*d
-            b1 = Psh(ENERGY, H12, RedMass, DeltaF) * \
-                RHO_SADDLE_POINT(b, FREQ, NFREQ)
+            b1 = psh(energy, h12, redmass, deltaf) * \
+                rho_saddle_point(b, freq, nfreq)
             st = a1+b1
-            st = st*Cal_cm
-            sum = 0
+            st = st*cal_cm
         else:
             it = 2**(i-2)
             tnm = it
-            del1 = (ENERGY-a)/tnm
+            del1 = (energy-a)/tnm
+            # print("print(it): ", it)
             x = a+0.5*del1
-            sum = 0
-            j = 1
-            while (j <= it):
-                y0 = Psh(x, H12, RedMass, DeltaF)
-                y1 = RHO_SADDLE_POINT((ENERGY-x), FREQ, NFREQ)
-                sum = sum + y0*y1*Cal_cm
+            sum = 0.
+            # print("for-----------------")
+            # print(x,del1)
+            for j in range(1, it+1):
+                # print ("--------------------: ", j)
+                y0 = psh(x, h12, redmass, deltaf)
+                # print(psh(x, h12, redmass, deltaf),"psh")
+                # print(y0,x, h12, redmass, deltaf, "xxx")
+                # print ("--------------------")
+                # print (y0)
+                # print ("--------------------")
+                y1 = rho_saddle_point((energy-x), freq, nfreq)
+                sum = sum + y0*y1*cal_cm
                 x = x + del1
-                j += 1
-            st = 0.5*(st+(ENERGY-a)*sum/tnm)
+            # print(x,y0,sum,y1)
+            # print("for-----------------")
+            st = 0.5*(st+(energy-a)*sum/tnm)
         s1 = 4*st-ost
         s = s1/3
         qsimp = s
-        f3.write('Iter. ')
-        f3.write(str(i))
-        f3.write('NMECP(E)= ')
-        f3.write(str(s))
-        f3.write('Grad = ')
-        f3.write(str(abs(s-os)))
-        f3.write('\n')
-        
-        if (abs(s-os) < EPS):
-            break
+        ncrfile.write('Iter. ' + str(i) + '   NMECP(E)= ' +
+                      str(s)+'   Grad = ' + str(abs(s-os))+'\n')
+        if abs(s-os) < eps:
+            return qsimp
         if (s == 0 and os == 0 and i > 6):
-            break
+            return qsimp
         os = s
         ost = st
-        i += 1
+    # print ("qsimpxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
     return qsimp
+    pass
 
-def Psh(Eh, H12, redmass, deltaF):
+
+def psh(eh, h12, redmass, deltaf):
     h = 6.6260693E-34
-    NA = 6.0221415E23
-    pi = 4*numpy.arctan(1)
-    if (Eh <= 0):
-        Psh = 0
+    na = 6.0221415E23
+    pi = 3.14
+    # print(eh, h12, redmass, deltaf)
+    if eh <= 0:
+        psh = 0.0
     else:
-        deltaE = Eh*1000*4.184/NA
-        A = -2*pi*H12*H12
-        B = math.sqrt(redmass/(2*deltaE))
-        C = h*deltaF
-        P = math.exp(A*B/C)
-        Psh = (1-P)*(1+P)
-    return Psh
+        deltae = eh*1000*4.184/na
+        # print ("print (deltae)")
+        # print (deltae)
+        # print ("print (deltae)")
+
+        a = -2*pi*h12*h12
+        b = math.sqrt(redmass/(2*deltae))
+        c = h*deltaf
+        p = math.exp(a*b/c)
+        # print ("-------------")
+        # print (a,b,c)
+        # print ("-------------")
+        # print
+        psh = (1-p)*(1+p)
+    # print (psh)
+    return psh
+    return 10
 
 
-def RHO_SADDLE_POINT(ENERGY, FREQ, NFREQ):
-    PI = numpy.arccos(-1)
-    eng = ENERGY * 349.755
-    RHO_SADDLE_POINT = 0
+def rho_saddle_point(energy, freq, nfreq):
+    pi = 3.14
+    eng = energy * 349.755
     if (eng <= 1):
-        RHO_SADDLE_POINT = 0
+        rho_saddle_point = 0.0
     else:
-        x1 = 1.E-20
-        x2 = 1.E+3
-        xacc = 1.E-12
-        b2 = ZRIDDR(x1, x2, xacc, eng, FREQ, NFREQ)
-        sum = 0
-        prod = 1
-        i = 0
-        while (i < NFREQ):
-            sum = sum + expsafe(b2*FREQ[i])*(FREQ[i]/(expsafe(b2*FREQ[i])-1))
-            prod = prod / (1 - expsafe(-b2*FREQ[i]))
-            i += 1
-        # RHO_SADDLE_POINT = (expsafe(b2*eng) * prod) / math.sqrt(2.0 * PI * sum)
-        RHO_SADDLE_POINT = 1
-    return RHO_SADDLE_POINT
+        x1 = 1.e-20
+        x2 = 1.e+3
+        xacc = 1.e-12
+        b2 = zriddr(x1, x2, xacc, eng, freq, nfreq)
+        sum = 0.
+        prod = 1.
+        for i in range(0, int(nfreq)):
+            temp1 = freq[i]/(expsafe(b2*freq[i])-1.)
+            temp1 = temp1 * temp1
+            sum = sum+expsafe(b2*freq[i])*temp1
+            prod = prod / (1.0 - expsafe(-b2*freq[i]))
+        rho_saddle_point = expsafe(b2*eng) * prod / math.sqrt(2.0 * pi * sum)
+        # rho_saddle_point = 10
+    # print (rho_saddle_point)
+    return rho_saddle_point
+    return 10
 
 
-def ZRIDDR(x1, x2, xacc, eng, FREQ, NFREQ):
-    MAXIT = 60
-    UNUSED = -1.11E30
-    maxfreq = 1000
-    fl = funcrzo(x1, eng, FREQ, NFREQ)
-    fh = funcrzo(x2, eng, FREQ, NFREQ)
+def zriddr(x1, x2, xacc, eng, freq, nfreq):
+    maxit = 60
+    unused = -1.11e30
+    fl = funcrzo(x1, eng, freq, nfreq)
+    fh = funcrzo(x2, eng, freq, nfreq)
+    zriddr = 0
     if ((fl > 0 and fh < 0) or (fl < 0 and fh > 0)):
         xl = x1
+        xl = x1
         xh = x2
-        zriddr = UNUSED
-        j = 1
-        while (j <= MAXIT):
+        zriddr = unused
+        for j in range(1, maxit+1):
             xn = xl+xh
             xm = 0.5*xn
-            fm = funcrzo(xm, eng, FREQ, NFREQ)
+            fm = funcrzo(xm, eng, freq, nfreq)
             s = math.sqrt(fm * fm - fl * fh)
-            if (s == 0):
-                break
+            if (s == 0.0):
+                return zriddr
+
             a = 1.0
             b = fl - fh
             xnew = xm+(xm-xl)*(math.copysign(a, b)*fm/s)
             if (abs(xnew-zriddr) <= xacc):
-                break
+                return zriddr
             zriddr = xnew
-            fnew = funcrzo(zriddr, eng, FREQ, NFREQ)
-            if (fnew == 0):
-                break
+            fnew = funcrzo(zriddr, eng, freq, nfreq)
+
+            if (fnew == 0.):
+                return zriddr
+
             if (math.copysign(fm, fnew) != fm):
                 xl = xm
                 fl = fm
@@ -251,37 +245,42 @@ def ZRIDDR(x1, x2, xacc, eng, FREQ, NFREQ):
             elif (math.copysign(fh, fnew) != fh):
                 xl = zriddr
                 fl = fnew
+            else:
+                print('never get here in zriddr')
             if (abs(xh-xl) <= xacc):
-                break
-            j += 1
-    elif (fl == 0):
+                return zriddr
+
+        print('zriddr exceed maximum iterations')
+    elif (fl == 0.):
         zriddr = x1
-    elif (fh == 0):
+    elif (fh == 0.):
         zriddr = x2
+    else:
+        print('root must be bracketed in zriddr')
     return zriddr
 
-def funcrzo(x, eng, FREQ, NFREQ):
+
+def funcrzo(x, eng, freq, nfreq):
     sum = 0
-    i = 0
-    while (i < NFREQ):
-        y = x*FREQ[i]
-        z = expsafe(y)-1
-        sum = sum+FREQ[i]/divsafe(z)
-        i += 1
-    return eng-sum
+    for i in range(0, int(nfreq)):
+        y = x*freq[i]
+        z = expsafe(y) - 1
+        sum = sum + freq[i]/divsafe(z)
+    return eng - sum
 
 
 def expsafe(arg):
-    if (arg > 700):
-        arg = 700
-    arg = numpy.exp(arg)
-    return arg
+    if (arg > 700.):
+        arg = 700.
+    expsafe = math.exp(arg)
+    return expsafe
 
 
 def divsafe(arg):
-    if (abs(arg) < 1.E-100):
-        arg = 1.E-100
-    return arg
+    if (abs(arg) < 1.e-100):
+        arg = 1.e-100
+    divsafe = arg
+    return divsafe
 
 
 if __name__ == "__main__":

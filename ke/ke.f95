@@ -192,7 +192,7 @@
     double precision :: H12,deltaF,A,B,C    
     	h = 6.6260693D-34 !Planck's constant (J.s)
    	 	NA = 6.0221415E23 !Avogadro constant (mol-1)
-    	Pi = 4*atan(1.)
+    	Pi = 3.14
     if (Eh<=0) then	!when Eh <= Ec ---> Psh(Eh-Ec) = 0, Harvey pp.
       Psh = 0.0
 	else
@@ -218,7 +218,7 @@
 	  DOUBLE PRECISION xacc,zriddr 
       double precision :: x1,x2,b2
 
-			PI = acos(-1.) 
+			PI = 3.14 
       		eng = ENERGY * 349.755!1153  ! Convert energy from kcal to cm-1
 		if(eng.le.1.) then
 	                 RHO_SADDLE_POINT = 0.0

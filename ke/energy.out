@@ -1,0 +1,61 @@
+
+Internal energy =   1.00  kcal/mol
+Available energy above MECP =366.22  kcal/mol
+Available energy above minima =180.01  kcal/mol
+
+
+ NMECP(E) = .64967E+03
+ RHO_R    = .77880E+05
+ k(E)     = .25008E+09 s-1
+
+
+Internal energy = 314.99  kcal/mol
+Available energy above MECP = 52.23  kcal/mol
+Available energy above minima =133.98  kcal/mol
+
+
+ NMECP(E) = .23115E+02
+ RHO_R    = .43225E+05
+ k(E)     = .16032E+08 s-1
+
+
+Internal energy =   0.00  kcal/mol
+Available energy above MECP =367.22  kcal/mol
+Available energy above minima =181.01  kcal/mol
+
+
+ NMECP(E) = .65233E+03
+ RHO_R    = .78746E+05
+ k(E)     = .24835E+09 s-1
+
+
+Internal energy =  20.53  kcal/mol
+Available energy above MECP =346.69  kcal/mol
+Available energy above minima =160.48  kcal/mol
+
+
+ NMECP(E) = .59840E+03
+ RHO_R    = .61937E+05
+ k(E)     = .28965E+09 s-1
+
+
+Internal energy =   1.38  kcal/mol
+Available energy above MECP =365.84  kcal/mol
+Available energy above minima =179.63  kcal/mol
+
+
+ NMECP(E) = .64866E+03
+ RHO_R    = .77553E+05
+ k(E)     = .25075E+09 s-1
+
+
+Internal energy =   0.00  kcal/mol
+Available energy above MECP =367.22  kcal/mol
+Available energy above minima =181.01  kcal/mol
+
+
+ NMECP(E) = .65233E+03
+ RHO_R    = .78746E+05
+ k(E)     = .24835E+09 s-1
+
+ Calculation finished! Open output file to get results.
