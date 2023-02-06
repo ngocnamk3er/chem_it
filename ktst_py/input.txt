@@ -1,0 +1,48 @@
+N2O + O(3P) --> N2 + O2 via MSX1
+Input the number of vibrational frequencies in A, B, and transition state (TS), respectively. Note that frequencies of TS are usually equal to 3N-7(or 6) - Degeneracy of unknown vibrational of TS (DGN)
+4,0,5
+Input the degeneracy of unknown vibrational frequencies of TS:
+0.0
+Input the imaginary frequency of transition state:
+266.6251 
+Input the estimated 2D hindred rotor frequency, the reduced moment of inertia, and the rotational symmetric number, respectively:
+0.0,0.0,0.0
+Input the mass of A, and B in GMW units, respectively:
+44,16
+Input the principle moments of inertia in "E-40 GM CM2" units of A:
+0.00000, 142.11306, 142.11306
+Input the principle moments of inertia in "E-40 GM CM2" units of B:
+0,0,0
+Input the principle moments of inertia in "E-40 GM CM2" units of TS:
+84.00847, 305.26643, 389.27490
+Input the statistical or symmetry factor multiply by electronic degeneracies. (Unchange this value for different system).
+2.0	
+Input the activation energy in kcal/mol of forward, and reverse bariers, respectively:
+41.3,120.8
+Input the number of internal rotations of A, B, and TS. (Unchange these values for different system).
+0,0,0	
+Input the frequencies for TS:
+189.8562,614.3746,625.1456,1144.2242,2227.1553
+Frequencies for A:
+621.5167, 621.5169, 1318.1700, 2351.4532
+The number of temperatures:
+18
+The range of temperatures:
+700.0
+800.0
+1000.0
+1200.0
+1400.0
+1600.0
+1800.0
+2000.0
+2200.0
+2400.0
+2600.0
+2800.0
+3000.0
+3400.0
+3800.0
+4200.0
+4600.0
+5000.0
