@@ -1,0 +1,42 @@
+# first data field times as Number of atoms, Read the number of gradients, electronic matrix element (cm-1) for coupling between two surfaces, Read the reduced mass of the system as it moves along the hopping coordinate, Convergence criterion for numerical integration 
+3
+7
+180.85007
+314.98839
+314.98839
+Relative energy of local minima (kcal/mol)
+181.00506
+Relative energy of MECP (kcal/mol)
+367.22051
+Read number of energies to calculate
+6
+Read internal energy (kcal/mol) above initial reactant
+1.0		 	 	
+314.98839    
+0.0     
+20.53   
+1.38   	
+0.0 
+Read singlet gradients from input file	
+1.0
+181.00506 	
+197.43033
+367.22051  	
+0.0    
+19.24 
+0.0 
+Read triplet gradients from input file	   
+0.0    
+0.0    
+0.0    
+0.0    
+0.0   
+0.0   
+0.0 
+# list data NFREQ
+1.0    
+145.44751 	
+180.85007
+# list data NFREQ_MECP
+6.27210   
+6.27236

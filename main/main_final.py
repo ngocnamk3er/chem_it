@@ -2,6 +2,7 @@ import csv
 import math
 import ke
 import cvtst
+import inputfile
 import os
 emin, gamma, v1, v22, delta, rt = (0 for i in range(0, 6)) # /eint/
 fva, fvb, fvx, air, dira = ([] for i in range(5)) #/FVS/
@@ -164,7 +165,7 @@ if __name__ == "__main__":
       os.mkdir(duongdan + '\output')
       
     # run file ke
-    file1 = open('..//ke_py//input.txt', 'r')
+    file1 = open('input//ke_input.txt', 'r')
     outputfile = open('output//output_ke.csv', 'w+', encoding='UTF8', newline='')
     energyfile = open('output//energy.csv', 'w+', encoding='UTF8', newline='')
     ncrfile = open('output//ncr(e).csv', 'w+', encoding='UTF8', newline='')
@@ -175,7 +176,7 @@ if __name__ == "__main__":
     ncrfile.close()
     
     # run file cvtst
-    f = open('..//CVTST-m_py//bimo.txt', 'r')
+    f = open('input//cvtst_input.txt', 'r')
     f1 = open('output//bimoout.csv', 'w+', encoding='UTF8', newline='')
     f2 = open('output//bimopaste.csv', 'w+', encoding='UTF8', newline='')  
     cvtst.cvtst(f, f1, f2)
@@ -184,7 +185,7 @@ if __name__ == "__main__":
     f2.close()
     
     inputArr = []
-    with open("..//ktst_py//input.txt", 'r') as file5:
+    with open("input//ktst_input.txt", 'r') as file5:
         lines = file5.readlines()
         for line in lines:
             inputArr.append(line.strip())
