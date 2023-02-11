@@ -1,11 +1,18 @@
 import math
 import re
+import csv
 import numpy
 
-def cvtst(f, f1, f2):
+
+def cvtst(f, f3, f4):
     global A, B, C, SN, SF, F, NF, NV
     title = f.readline()
-    f1.write(title)
+    header = title.split('\n')[0].strip()
+    writer = csv.writer(f3)
+    writer1 = csv.writer(f4)
+        # write the header
+    writer.writerow([header])
+    writer1.writerow(['Temperatures'])
     NP = int(re.findall(r'\d+', f.readline())[0])
     NR = int(re.findall(r'\d+', f.readline())[0])
 
@@ -64,11 +71,11 @@ def cvtst(f, f1, f2):
     for L in range(0, NP):
         f.readline()
         stringRead = f.readline()
-        f1.write(stringRead)
         stringRead = stringRead.split()
         GEO.append(float(stringRead[0]))
         E.append(float(stringRead[1]))
         SPECIES = stringRead[2].split('\n')
+        writer.writerow([GEO[L],E[L],SPECIES[0]])
         E[L] = E[L] * 627.50595E0
         BE = 0
         AE = 0
@@ -78,7 +85,7 @@ def cvtst(f, f1, f2):
         G0 = 0
         G1 = 0
         EE = 0
-        if SPECIES == 'diatomic':
+        if SPECIES[0] == 'diatomic':
             stringRead = f.readline().split()
             WT = float(stringRead[0])
             G0 = float(stringRead[1])
@@ -133,12 +140,11 @@ def cvtst(f, f1, f2):
             EZ[NR - 1] = EZ[NR - 1] * float(M[i]) * EZ[i]
             for j in range(0, NT):
                 DGT[NR - 1][j] = DGT[NR - 1][j] + float(M[i]) * DGT[i][j]
-    f1.writelines('Geometrical Parameters:')
-    f1.write('\n')
+
+    writer.writerow(['Geometrical Parameters:'])
     i = NR - 1
     while i < NP:
-        f1.write(str(GEO[i]))
-        f1.write('\n')
+        writer.writerow([str(GEO[i])])
         i += 1
     # dG/dR\
     GDAT = []
@@ -147,10 +153,8 @@ def cvtst(f, f1, f2):
     GEOM = []
     dGdR = []
     for i in range(0, NT):
-        f1.write('--------- dG at ')
-        f1.write(str(TEMP[i]))
-        f1.write(' Degrees Kelvin:\n')
-        f1.write('R [Angstrom]    G [kcals/mol]    dG/dR\n')
+        writer.writerow(['--------- dG at ' + str(TEMP[i]) + ' Degrees Kelvin:'])
+        writer.writerow(['R [Angstrom]','G [kcals/mol]','dG/dR'])
         GDAT.append(-10)
         GEOM.append(0)
         EZT.append(0)
@@ -171,112 +175,70 @@ def cvtst(f, f1, f2):
         j = NR - 1
         while j < NP:
             if j == NR - 1 or j == NP - 1:
-                f1.write(str(GEO[j]))
-                f1.write('\t\t')
-                f1.write(str(GG[j - 1]))
-                f1.write('\t\t')
-                f1.write('NAN\n')
+                writer.writerow([str(GEO[j]),str(GG[j - 1]),'NAN'])
             else:
                 dGdRA = (GG[j] - GG[j - 1]) / (GEO[j + 1] - GEO[j])
                 dGdRB = (GG[j - 1] - GG[j - 1 - 1]) / (GEO[j] - GEO[j - 1])
                 # dGdR.append((dGdRA + dGdRB) / 2)
-                f1.write(str(GEO[j]))
-                f1.write('\t\t')
-                f1.write(str(GG[j - 1]))
-                f1.write('\t\t')
-                f1.write(str((dGdRA + dGdRB) / 2))
-                f1.write('\n')
+                writer.writerow([str(GEO[j]),str(GG[j - 1]),str((dGdRA + dGdRB) / 2)])
             j += 1
-
-    f1.write('\n')
-    f1.write('Greatest Gibbs Free-Energy Barriers [kcals/mol]\n')
-    f1.write('at the temperatures specified:\n')
-    f1.write('T [Kelvin]  R [Angstrom]  G [kcals/mol]\n')
+    writer.writerow(['Greatest Gibbs Free-Energy Barriers [kcals/mol]'])
+    writer.writerow(['at the temperatures specified:'])
+    writer.writerow(['T [Kelvin]','R [Angstrom]','G [kcals/mol]'])
     for k in range(0, NT):
-        f1.write(str(TEMP[k]))
-        f1.write('\t\t')
-        f1.write(str(GEOM[k]))
-        f1.write('\t\t')
-        f1.write(str(GDAT[k]))
-        f1.write('\n')
+        writer.writerow([str(TEMP[k]),str(GEOM[k]),str(GDAT[k])])
 
     # Do quadratic least squares fit to GDAT as function of temperature
-    AA = []
-    BB = []
-    for i in range(0, NT):
-        AA.append(0)
-        BB.append(0)
-        temp = [0, 0, 0]
-        temp[0] = TEMP[i] * TEMP[i]
-        temp[1] = TEMP[i]
-        temp[2] = 1
-        AA[i] = temp
-        BB[i] = GDAT[i]
+    # AA = []
+    # BB = []
+    # for i in range(0, NT):
+    #     AA.append(0)
+    #     BB.append(0)
+    #     temp = [0, 0, 0]
+    #     temp[0] = TEMP[i] * TEMP[i]
+    #     temp[1] = TEMP[i]
+    #     temp[2] = 1
+    #     AA[i] = temp
+    #     BB[i] = GDAT[i]
+    # print(AA)
+    # print(BB)
     X = [-0.116962E-02 / 1000, 0.336330E+02 / 1000, -0.695957E+04 / 1000]
     ISING = 0
     WW = []
     # comment code coding fix bug 
     # HOUSEFIT(AA, NT, 3, BB, NT, 1, X, WW, ISING)
-    f1.write('\n')
-    f1.write('Same Barriers from quadratic fit:\n')
-    f1.write('T [Kelvin]  G [kcals/mol]\n')
+    writer.writerow(['Same Barriers from quadratic fit:'])
+    writer.writerow(['T [Kelvin]','G [kcals/mol]'])
     for i in range(0, NT):
         PRED = X[0] * TEMP[i] * TEMP[i] + X[1] * TEMP[i] + X[2]
-        f1.write(str(TEMP[i]))
-        f1.write('\t\t')
-        f1.write(str(PRED))
-        f1.write('\n')
+        writer.writerow([str(TEMP[i]),str(PRED)])
     # Convert to Calories:
     X[0] = X[0] * 1000
     X[1] = X[1] * 1000
     X[2] = X[2] * 1000
-    f1.write('\n')
-    f1.write('dG(FIT) = ')
-    f1.write(str(X[0]))
-    f1.write(' T^2 ')
-    f1.write(str(X[1]))
-    f1.write(' T + ')
-    f1.write(str(X[2]), )
-    f1.write('  [Calories])\n')
-    f1.write('\n')
+    writer.writerow(['dG(FIT) = ' + str(X[0]) + ' T^2 + ' + str(X[1]) + 'T + ' + str(X[2]) + '  [Calories]'])
     # Print out Rate Constant equation and k @ temps
     for i in range(0, NT):
-        f2.write(str(TEMP[i]))
-        f2.write('\n')
-    f2.write('\n')
-    f2.write('\n')
-    f1.write('Rate Constant:\n')
-    f1.write('k = ')
-    f1.write(str(RCC))
-    f1.write(' T^')
-    f1.write(str(NN))
-    f1.write(' exp(-dG/RT)  [cc/molecule]^')
-    f1.write(str(NN - 1))
-    f1.write('/second\n')
-    f1.write('\n')
-    f1.write('\t\tdG = Raw Data       \t\tdG = Quad. Fit\n')
+        writer1.writerow([str(TEMP[i])])
+    writer1.writerow([])
+    writer.writerow(['Rate Constant:'])
+    writer.writerow(['k = ' + str(RCC) + ' T^' + str(NN) + ' exp(-dG/RT)  [cc/molecule]^' + str(NN - 1) + '/second'])
+    writer.writerow(['','dG = Raw Data','dG = Quad. Fit'])
     for i in range(0, NT):
         PRED = X[0] * TEMP[i] * TEMP[i] + X[1] * TEMP[i] + X[2]
         FRC = RCC * (TEMP[i] ** NN) * numpy.exp(-PRED / (R * TEMP[i]))
         RRC = RCC * (TEMP[i] ** NN) * numpy.exp(-GDAT[i] * 1000 / (R * TEMP[i]))
-        f1.write(str(TEMP[i]))
-        f1.write('\t\t')
-        f1.write(str(RRC))
-        f1.write('\t\t')
-        f1.write(str(FRC))
-        f1.write('\n')
-        f2.write(str(RRC))
-        f2.write('\n')
+        writer.writerow([str(TEMP[i]),str(RRC),str(FRC)])
+        writer1.writerow([str(RRC)])
     if TUN == "yes":
-        f1.write('\n')
-        f2.write('\n')
-        f1.write('Tunneling factor = [1 +(hcw/kT)^2(1+RT/Eo)/24])\n')
-        f1.write('where w(cm^-1) = negative frequency (along path))\n')
-        f1.write('Note: This factor only valid for small barriers)\n')
-        f1.write('with a width of less than about 1.8 Angstroms.)\n')
-        f1.write('\n')
-        f1.write('Rates with Tunneling Correction:)\n')
-        f1.write('\n')
+        writer.writerows([
+            ['Tunneling factor = [1 +(hcw/kT)^2(1+RT/Eo)/24])'],
+            ['where w(cm^-1) = negative frequency (along path))'],
+            ['Note: This factor only valid for small barriers)'],
+            ['with a width of less than about 1.8 Angstroms.)'],
+            [],
+            ['Rates with Tunneling Correction:)']
+        ])
         for i in range(0, NT):
             PRED = X[0] * TEMP[i] * TEMP[i] + X[1] * TEMP[i] + X[2]
             FRC = RCC * (TEMP[i] ** NN) * numpy.exp(-PRED / (R * TEMP[i]))
@@ -286,15 +248,8 @@ def cvtst(f, f1, f2):
             TF = TF + 1.0
             RRC = TF * RRC
             FRC = TF * FRC
-            f1.write(str(TEMP[i]))
-            f1.write('\t\t')
-            f1.write(str(RRC))
-            f1.write('\t\t')
-            f1.write(str(FRC))
-            f1.write('\n')
-            f2.write(str(RRC))
-            f2.write('\n')
-
+            writer.writerow([str(TEMP[i]),str(RRC),str(FRC)])
+            writer1.writerow([str(RRC)])
 
 def GIBBS(NT, TEMP, L, SPECIES, WT, G0, G1, EE, BE, AE, WE, WEX, SN, SF, A, B, C, F, NF, W, NV, DGT, E, RES, ZPE, EZ):
     C1 = 1.438767553
@@ -390,36 +345,36 @@ def GIBBS(NT, TEMP, L, SPECIES, WT, G0, G1, EE, BE, AE, WE, WEX, SN, SF, A, B, C
 def HOUSEFIT(A, M, N, B, K, L, X, W, ISING):
     # (AA, NT, 3, BB, NT, 1, X, WW, ISING)
     HOUSETRANS(A, M, N, B, K, L, W, ISING)
-    # BACKSUB(A, M, N, B, K, L, X)
+    BACKSUB(A, M, N, B, K, L, X)
     pass
 
 
 def HOUSETRANS(A, M, N, B, KB, LB, W, ISING):
-    A.insert(0,[0,0,0])
-    for K in range(1, N + 1):
+    # pass
+    for K in range(0, N):
         MX = idamax(M - K + 1, A[K][K], 1) + K - 1
         RMS = 0.0
         I = K
-    #     while I <= M:
-    #         W[I] = A[I][K] / abs(A[MX][K])
-    #         RMS = RMS + W[I] * W[I]
-    #         I += 1
-    #     RMS = math.sqrt(RMS)
-    #     BK = 1 / (RMS * (RMS + abs(W[K])))
-    #     ZZ = W[K]
-    #     W[K] = W[K] + numpy.sign(RMS, ZZ)
-    #     J = 1
-    #     while J <= N:
-    #         S = ddot(M - K + 1, W[K], 1, A[K][J], 1)
-    #         S = BK * S
-    #         daxpy(M - K + 1, -S, W[K], 1, A[K][J], 1)
-    #         J += 1
-    #     J = 1
-    #     while J <= LB:
-    #         S = ddot(M - K + 1, W[K], 1, B[K][J], 1)
-    #         S = BK * S
-    #         daxpy(M - K + 1, -S, W[K], 1, B[K][J], 1)
-    #         J += 1
+        while I <= M:
+            W[I] = A[I][K] / abs(A[MX][K])
+            RMS = RMS + W[I] * W[I]
+            I += 1
+        RMS = math.sqrt(RMS)
+        BK = 1 / (RMS * (RMS + abs(W[K])))
+        ZZ = W[K]
+        W[K] = W[K] + numpy.sign(RMS, ZZ)
+        J = 1
+        while J <= N:
+            S = ddot(M - K + 1, W[K], 1, A[K][J], 1)
+            S = BK * S
+            daxpy(M - K + 1, -S, W[K], 1, A[K][J], 1)
+            J += 1
+        J = 1
+        while J <= LB:
+            S = ddot(M - K + 1, W[K], 1, B[K][J], 1)
+            S = BK * S
+            daxpy(M - K + 1, -S, W[K], 1, B[K][J], 1)
+            J += 1
 
 
 def BACKSUB(A, M, N, B, KB, LB, X):

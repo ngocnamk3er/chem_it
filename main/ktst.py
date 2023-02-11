@@ -1,3 +1,4 @@
+import csv
 import math
 import numpy as np
 emin, gamma, v1, v22, delta, rt = (0 for i in range(0, 6)) # /eint/
@@ -87,11 +88,8 @@ def eckart(t, e0, e1, vimag, qtun):
         freq =cl*vimag
         v1 = e0-e1
         v22 = math.sqrt(e1)+math.sqrt(e0)
-        # print(freq)
         gamma = 2*math.sqrt(e0*e1)/(h*freq)
-        # print(gamma)
         if gamma < 0.5:
-            print("    E1*E0 IS TOO SMALL. THE PROGRAM WILL STOP")
             exit()
         delta = math.sqrt(gamma**2-0.25)
         rt = r*t
@@ -107,7 +105,6 @@ def eckart(t, e0, e1, vimag, qtun):
         x = 2*math.pi*(alfa+beta)
         y = 2*math.pi*(alfa-beta)
         z = 2*math.pi*delta
-        # print(x,-x)
         # c = (np.exp(x) + np.exp(-x))/2
         # d = (np.exp(y) + np.exp(-y))/2
         # e = (np.exp(z) + np.exp(-z))/2
@@ -121,12 +118,9 @@ def eckart(t, e0, e1, vimag, qtun):
         edg = edg*math.exp((e0 - emax)/rt)/rt
 
         sum1 = 0
-        # print(n-1)
         check = 0
         while check == 0:
             sum1 = total(n-1,st,  st, e0, sum1)
-            # print(n-1, st,st,e0,sum1)
-            # print("eckart")
             sum1 = sum1 + edg
             x0 = st/2
             sum2 = 0
@@ -139,32 +133,22 @@ def eckart(t, e0, e1, vimag, qtun):
                 break
             else:
                 sum1 = sum2
-        # print("end eckart")
         qtun = sum2 * st
         return qtun
-
 
 def total(n, x0, st, e0, sum):# kha nang cao loi o ham nay
     global emin,gamma,v1,v22,delta,rt
     sum = 0
     e = emin + x0
-    # print ('gamma,e,v1,v22-----------')
-    # print (gamma,e,v1,v22,delta)
-    # print ('e,v1------------')
     for i in range(0,n):
         alfa=gamma*math.sqrt(e)/v22
         beta=gamma*math.sqrt(e-v1)/v22
-        # test.write('gamma,e,v1,v22,alfa,betaa-------------\n')
-        # test.write(str(gamma)+"-"+str(e)+str("-")+str(v1)+"-"+str(v22)+"-"+str(alfa)+"-"+str(beta)+"\n")
         x1 = 2*math.pi*(alfa+beta)
         y1 = 2*math.pi*(alfa-beta)
         z1 = 2*math.pi*delta
-        # test.write('x1,y1,z1------------')
-        # test.write(str(x1)+"---"+str(y1)+"----"+str(z1)+"----"+'\n')
         x1 = x1/10
         y1 = y1/10
         z1 = z1/10
-        # print(x1,y1,z1)
         c1 = (math.exp(x1)+math.exp(-x1))/2 # số lớn quá ko tính đc nhưng fortran vẫn tính đc ????
         d1 = (math.exp(y1)+math.exp(-y1))/2
         f1 = (math.exp(z1)+math.exp(-z1))/2
@@ -173,15 +157,16 @@ def total(n, x0, st, e0, sum):# kha nang cao loi o ham nay
         sum = sum + s
         e = e + st
     return sum
-
+# def main():
 if __name__ == "__main__":
     # đọc dữ liệu từ file input.txt và lưu vào mảng inputArr
     inputArr = []
-    file1 = open('..//ktst_py//input.txt', 'r')
-    Lines = file1.readlines()
-    for line in Lines:
-        inputArr.append(line.strip())
-    
+    output = open('output//output_ktst.csv', 'w+', encoding='UTF8', newline='')
+    writer = csv.writer(output)
+    with open("..//ktst_py//input.txt", 'r') as file1:
+        lines = file1.readlines()
+        for line in lines:
+            inputArr.append(line.strip())
     t,eaa,vimag,qtun = (0 for i in range(4))
     #khai báo các biến chưa được khai báo và không được gán trong fortran, giá trị mặc định là 0
     #khai báo biến được khai báo ở tham số trong subroutine fortran
@@ -225,18 +210,12 @@ if __name__ == "__main__":
         if nirx != 0 :
             xir = (list(map(float, inputArr[23].split(','))))
             fvxir = (list(map(float, inputArr[23].split(','))))
-            # read (5,*) (XIR(I), FVXIR(I),I=1,NIRx) 
-            # READ (5,*) (DIRx(I),I=1,NIRx) 
         if nira != 0 :
             air = (list(map(float, inputArr[23].split(','))))
             dira = (list(map(float, inputArr[23].split(','))))
-            # read (5,*) (aIR(I),I=1,NIRa)
-            # READ (5,*) (DIRa(I),I=1,NIRa) 
         if nirb != 0 :
             bir = (list(map(float, inputArr[23].split(','))))
             dirb = (list(map(float, inputArr[23].split(','))))
-            # read (5,*) (bIR(I),I=1,NIRb)
-            # READ (5,*) (DIRb(I),I=1,NIRb) 
         fvx = (list(map(float, inputArr[24].split(','))))
 
         fva = (list(map(float, inputArr[26].split(','))))
@@ -245,67 +224,29 @@ if __name__ == "__main__":
         if nb != 0:
             FVB = (list(map(float, inputArr[28].split(','))))
         
-        # in ra màn hình console
-        print("----------"+Title+"---------------")
-        print("%10.4f%10.4f%10.4f%10.4f%10.4f%10.4f%10.4f%10.4f" % (na,nb,nx,dgn,vimag,fhr,dihr,rshr))
-        print("%10.4f%10.4f%10.4f%10.4f%10.4f%10.4f%10.4f%10.4f" % (wa,wb,ai1,ai2,ai3,bi1,bi2,bi3))
-        print("%10.4f%10.4f%10.4f%10.4f%10.4f%10.4f" % (dl,xi1,xi2,xi3,ea,eaa))
-        print("%10.4f%10.4f%10.4f" % (nirx,nira,nirb))
-        #-----------------------
-        if nirx !=0 :
-            print(xir)
-            print(dirx)
-        if nira != 0:
-            print(air)
-            print(dira)
-        if nirb != 0:
-            print(bir)
-            print(dirb)
-        print(fvx)
-        print(fva)
-        print(fvb)
+        # # in ra màn hình console
+        # print("----------"+Title+"---------------")
+        # print("%10.4f%10.4f%10.4f%10.4f%10.4f%10.4f%10.4f%10.4f" % (na,nb,nx,dgn,vimag,fhr,dihr,rshr))
+        # print("%10.4f%10.4f%10.4f%10.4f%10.4f%10.4f%10.4f%10.4f" % (wa,wb,ai1,ai2,ai3,bi1,bi2,bi3))
+        # print("%10.4f%10.4f%10.4f%10.4f%10.4f%10.4f" % (dl,xi1,xi2,xi3,ea,eaa))
+        # print("%10.4f%10.4f%10.4f" % (nirx,nira,nirb))
         vhr = 0.0
-        print("VHR = %.4f kcal/mol -- EA = %.4f kcal/mol" % (vhr,ea))
-
-        # ghi tiêu đề ra file
-        L = ["                         THE RATE CONSTANTS ARE LISTED BELOW\n", 
-            "-----------------------------------------------------------------------------------------------------\n", 
-            "Temperature          k(T),cm^3/mole.s          k(T),cm^3/molecule.s          Eckart coefficients\n",
-            "-----------------------------------------------------------------------------------------------------"]
-
-        # writing to file
-        file1 = open('..//output//output.txt', 'w')
-        test = open('..//output//test.txt', 'w')
-        file1.writelines(L)
-        # file1.close()
-
-        # đọc từ file input tiếp 
-    
+        writer.writerow(['THE RATE CONSTANTS ARE LISTED BELOW'])
+        writer.writerow([])
+        writer.writerow(['Temperature','k(T),cm^3/mole.s','k(T),cm^3/molecule.s','Eckart coefficients'])    
         k = list(map(int, inputArr[28].split(',')))[0]
-
-        # vòng lặp sau đọc đoạn The range of temperatures và xử lí kết quả:
-
         for i in range(1,k+1):
 
             t = list(map(float, inputArr[29+i].split(',')))[0]
-            # print(t)
-            if t <=0 :
-                print("Go to # đọc dữ liệu từ file input.txt")
             rt = r*t
             qhr = 1.0
             if vimag <= 0:
                 qtun = 1.0
             qtun = eckart(t, ea,eaa,vimag,qtun)
-            # print("t:"+str(t)+"   ea:"+str(ea)+"   eaa:"+str(eaa)+"   vimag:"+str(vimag)+"   qtun:"+str(qtun))
-            print("")
             t1 = t
             q,qx = partif(t1,q,nira,dira,air,nirb,dirb,bir,qx)
             rkcal = dl * (2.083E10) * t * q * math.exp(-ea/rt) *qtun * qhr
-            # print("dl:"+str(dl)+"   t:"+str(t)+"   q:"+str(q)+"   ea:"+str(ea)+"   rt:"+str(rt)+"   qtun:"+str(qtun)+"   qhr:"+str(qhr))
             rkcal2 = rkcal / 6.022E+23
-            print(str(rkcal),str(rkcal2))
-            # print(str(T)+"---"+str(rkcal)+"---"+str(rkcal2)+"---"+str(qtun))
-            
-            space = "                    "
-            # file1.writelines("\n"+str(T)+space+str(rkcal)+space+str(rkcal2)+space+str(qtun)+"\n")
-            file1.writelines("\n%10.4f-----" %(t) +str(rkcal)+"------------"+str(rkcal2)+"---------%30.4f\n" % (qtun))
+            writer.writerow([t,str(rkcal),str(rkcal2),qtun])
+# if __name__ == "__main__":
+#     main()

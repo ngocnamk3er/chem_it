@@ -1,6 +1,10 @@
 import math
+import csv
 
 def ke(file1, outputfile, energyfile, ncrfile):
+    writer = csv.writer(outputfile)
+    writer1 = csv.writer(energyfile)
+    writer2 = csv.writer(ncrfile)
     planck = 6.6260693e-34  # planck's constant (j * s)
     na = 6.0221415e23       # avogadro constant (mol-1)
     bohr = 0.5291772108e-10  # bohr radius (m)
@@ -40,42 +44,37 @@ def ke(file1, outputfile, energyfile, ncrfile):
     coef = 62750.94717e-2*1000*4.184/na/bohr
     sqr = math.sqrt(deltaf)
     deltaf = sqr*coef
-    outputfile.write('the results of k(e) are listed below\n')
-    outputfile.write('\n')
-    outputfile.write('e(internal),kcal/mol'+'----'+'k(e),s-1' +
-                     '----'+'p(sh)'+'----'+'nmecp'+'----'+'rho(reactant)\n')
-    outputfile.write('\n')
-
+    writer.writerow(['the results of k(e) are listed below'])
+    writer.writerow([])
+    writer.writerow(['e(internal),kcal/mol','k(e),s-1','p(sh)','nmecp','rho(reactant)'])
+    writer1.writerow([
+        'internal energy(kcal/mol)',
+        'available energy above mecp(kcal/mol)',
+        'available energy above minima(kcal/mol)',
+        'nmecp(e)',
+        'rho_r',
+        'k(e) s-1'
+        ])
     for i in range(0, int(ncalc)):
         energy_mecp = abs(energy[i]-emecp)
         energy_min = abs(energy[i]-e_min)
-        energyfile.write("\n")
-        energyfile.write('internal energy = %f kcal/mol\n' % energy[i])
-        energyfile.write(
-            'available energy above mecp = %f kcal/mol\n' % energy_mecp)
-        energyfile.write(
-            'available energy above minima = %f kcal/mol\n' % energy_min)
-        ncrfile.write("\n")
-        ncrfile.write(
-            'calculating the integrated density of states ncr(e) ...\n')
-        energyfile.write("\n")
-        nmecp = qsimp(energy_mecp, h12, redmass, deltaf,
-                      freq_mecp, nfreq_mecp, eps, ncrfile)
+        writer2.writerow([])
+        writer2.writerow(['calculating the integrated density of states ncr(e) ...'])
 
+        ncrwrite = []
+        nmecp = qsimp(energy_mecp, h12, redmass, deltaf,
+                      freq_mecp, nfreq_mecp, eps, ncrwrite)
+        writer2.writerows(ncrwrite)
         rho_reactant = rho_saddle_point(energy_min, freq, nfreq)
 
         rate = nmecp/(rho_reactant*(planck/j_cm))
         p_sh = psh(energy_mecp, h12, redmass, deltaf)
-
-        energyfile.write('nmecp(e) = %f\n' % nmecp)
-        energyfile.write('rho_r    = %f\n' % rho_reactant)
-        energyfile.write('k(e)     = %f s-1\n' % rate)
-        energyfile.write("\n")
-        outputfile.write(str(energy[i])+"         "+str(rate)+"         "+str(
-            p_sh)+"         " + str(nmecp)+"         "+str(rho_reactant)+'\n')
+        
+        writer1.writerow([energy[i],energy_mecp,energy_min,nmecp,rho_reactant,rate])
+        writer.writerow([str(energy[i]),str(rate),str(p_sh),str(nmecp),str(rho_reactant)])
 
 
-def qsimp(energy, h12, redmass, deltaf, freq, nfreq, eps, ncrfile):
+def qsimp(energy, h12, redmass, deltaf, freq, nfreq, eps, ncrwrite):
     # print ("qsimpxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
     # print(energy, h12, redmass, deltaf, freq, nfreq, eps)
     jmax = 200
@@ -120,8 +119,7 @@ def qsimp(energy, h12, redmass, deltaf, freq, nfreq, eps, ncrfile):
         s1 = 4*st-ost
         s = s1/3
         qsimp = s
-        ncrfile.write('Iter. ' + str(i) + '   NMECP(E)= ' +
-                      str(s)+'   Grad = ' + str(abs(s-os))+'\n')
+        ncrwrite.append(['Iter. ' + str(i) + '   NMECP(E)= ' + str(s)+ '   Grad = ' + str(abs(s-os))])
         if abs(s-os) < eps:
             return qsimp
         if (s == 0 and os == 0 and i > 6):

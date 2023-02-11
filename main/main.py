@@ -10,9 +10,9 @@ if __name__ == "__main__":
       
     # run file ke
     file1 = open('..//ke_py//input.txt', 'r')
-    outputfile = open('output//output.txt', 'w+')
-    energyfile = open('output//energy.txt', 'w+')
-    ncrfile = open('output//ncr(e).txt', 'w+')
+    outputfile = open('output//output_ke.csv', 'w+', encoding='UTF8', newline='')
+    energyfile = open('output//energy.csv', 'w+', encoding='UTF8', newline='')
+    ncrfile = open('output//ncr(e).csv', 'w+', encoding='UTF8', newline='')
     ke.ke(file1, outputfile, energyfile, ncrfile)
     file1.close()
     outputfile.close()
@@ -21,8 +21,8 @@ if __name__ == "__main__":
     
     # run file cvtst
     f = open('..//CVTST-m_py//bimo.txt', 'r')
-    f1 = open('output//bimoout.txt', 'w+')
-    f2 = open('output//bimopaste.txt', 'w+')
+    f1 = open('output//bimoout.csv', 'w+', encoding='UTF8', newline='')
+    f2 = open('output//bimopaste.csv', 'w+', encoding='UTF8', newline='')  
     cvtst.cvtst(f, f1, f2)
     f.close()
     f1.close()
