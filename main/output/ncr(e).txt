@@ -1,0 +1,29 @@
+
+calculating the integrated density of states ncr(e) ...
+Iter. 1   NMECP(E)= 0.0   Grad = 1e+30
+Iter. 2   NMECP(E)= 428.89170439064395   Grad = 428.89170439064395
+Iter. 3   NMECP(E)= 649.6718966452449   Grad = 220.780192254601
+
+calculating the integrated density of states ncr(e) ...
+Iter. 1   NMECP(E)= 0.0   Grad = 1e+30
+Iter. 2   NMECP(E)= 23.1150422168202   Grad = 23.1150422168202
+
+calculating the integrated density of states ncr(e) ...
+Iter. 1   NMECP(E)= 0.0   Grad = 1e+30
+Iter. 2   NMECP(E)= 430.6494835904789   Grad = 430.6494835904789
+Iter. 3   NMECP(E)= 652.334543764369   Grad = 221.68506017389007
+
+calculating the integrated density of states ncr(e) ...
+Iter. 1   NMECP(E)= 0.0   Grad = 1e+30
+Iter. 2   NMECP(E)= 395.0471749752491   Grad = 395.0471749752491
+Iter. 3   NMECP(E)= 598.4049171600084   Grad = 203.35774218475927
+
+calculating the integrated density of states ncr(e) ...
+Iter. 1   NMECP(E)= 0.0   Grad = 1e+30
+Iter. 2   NMECP(E)= 428.2243769038128   Grad = 428.2243769038128
+Iter. 3   NMECP(E)= 648.6610429512892   Grad = 220.43666604747642
+
+calculating the integrated density of states ncr(e) ...
+Iter. 1   NMECP(E)= 0.0   Grad = 1e+30
+Iter. 2   NMECP(E)= 430.6494835904789   Grad = 430.6494835904789
+Iter. 3   NMECP(E)= 652.334543764369   Grad = 221.68506017389007
