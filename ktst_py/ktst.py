@@ -174,14 +174,13 @@ def total(n, x0, st, e0, sum):# kha nang cao loi o ham nay
         e = e + st
     return sum
 
-if __name__ == "__main__":
+def main():
     # đọc dữ liệu từ file input.txt và lưu vào mảng inputArr
     inputArr = []
-    file1 = open('input.txt', 'r')
-    Lines = file1.readlines()
-    for line in Lines:
-        inputArr.append(line.strip())
-    
+    with open("input.txt", 'r') as file1:
+        lines = file1.readlines()
+        for line in lines:
+            inputArr.append(line.strip())
     t,eaa,vimag,qtun = (0 for i in range(4))
     #khai báo các biến chưa được khai báo và không được gán trong fortran, giá trị mặc định là 0
     #khai báo biến được khai báo ở tham số trong subroutine fortran
