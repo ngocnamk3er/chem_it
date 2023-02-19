@@ -428,6 +428,7 @@ def HOUSETRANS(A, M, N, B, KB, LB, W):
             if(temp[i] != 0):
                 new_temp.append(temp[i])
         W.append(new_temp)
+        print(W)
         for J in range(0,N):
             temp1 = []
             for i in range(0,len(numpy.transpose(A)[J])):
@@ -435,12 +436,16 @@ def HOUSETRANS(A, M, N, B, KB, LB, W):
                     temp1.append(numpy.transpose(A)[J][i])
             S = ddot(M - K, W[K], 1, temp1, 1)
             S = BK * S
-            print(S)
-            daxpy(M - K, -S, W[K], 1, temp1, 1)
+         #   daxpy(M - K, -S, W[K], 1, temp1, 1)
             
-        # for J in range(0,LB):
-        #     S = ddot(M - K + 1, W[K], 1, B[K][J], 1)
-        #     S = BK * S
+        for J in range(0,LB):
+            temp1 = []
+            for i in range(0,len(numpy.transpose(B)[J])):
+                if(i >= K):
+                    temp1.append(numpy.transpose(B)[J][i])
+            S = ddot(M - K, W[K], 1, temp1, 1)
+            S = ddot(M - K + 1, W[K], 1, temp1, 1)
+            S = BK * S
         #     daxpy(M - K + 1, -S, W[K], 1, B[K][J], 1)
 
 def BACKSUB(A, M, N, B, KB, LB, X):
@@ -473,8 +478,6 @@ def idamax(n, dx, incx):
 def daxpy(n, da, dx, incx, dy, incy):
     for i in range(0, n):
         dy[i] = dy[i] + da * dx[i]
-        print(dx[i])
-
 
 def idamax(n, dx, incx):
     ii = 1
