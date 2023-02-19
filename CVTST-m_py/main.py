@@ -206,24 +206,28 @@ def main():
         f1.write('\n')
 
     # Do quadratic least squares fit to GDAT as function of temperature
-    # AA = []
-    # BB = []
-    # for i in range(0, NT):
+    AA = []
+    BB = []
+    # for i in range(0, 3*NT):
     #     AA.append(0)
-    #     BB.append(0)
-    #     temp = [0, 0, 0]
-    #     temp[0] = TEMP[i] * TEMP[i]
-    #     temp[1] = TEMP[i]
-    #     temp[2] = 1
-    #     AA[i] = temp
-    #     BB[i] = GDAT[i]
-    # print(AA)
-    # print(BB)
+    for i in range(0, NT):
+        AA.append(0)
+        BB.append(0)
+        temp = [0, 0, 0]
+        temp[0] = TEMP[i] * TEMP[i]
+        temp[1] = TEMP[i]
+        temp[2] = 1
+        # AA[i] = TEMP[i] * TEMP[i]
+        # AA[i + NT] = TEMP[i]
+        # AA[i + 2*NT] = 1
+        AA[i] = [temp[0],temp[1],temp[2]]
+        BB[i] = GDAT[i]
+    
     X = [-0.116962E-02 / 1000, 0.336330E+02 / 1000, -0.695957E+04 / 1000]
-    ISING = 0
+    X = [0,0,0]
     WW = []
-    # comment code coding fix bug 
-    # HOUSEFIT(AA, NT, 3, BB, NT, 1, X, WW, ISING)
+    HOUSEFIT(AA, NT, 3, BB, NT, 1, X, WW)
+    
     f1.write('\n')
     f1.write('Same Barriers from quadratic fit:\n')
     f1.write('T [Kelvin]  G [kcals/mol]\n')
@@ -265,7 +269,8 @@ def main():
     for i in range(0, NT):
         PRED = X[0] * TEMP[i] * TEMP[i] + X[1] * TEMP[i] + X[2]
         FRC = RCC * (TEMP[i] ** NN) * numpy.exp(-PRED / (R * TEMP[i]))
-        RRC = RCC * (TEMP[i] ** NN) * numpy.exp(-GDAT[i] * 1000 / (R * TEMP[i]))
+        RRC = RCC * (TEMP[i] ** NN) * \
+            numpy.exp(-GDAT[i] * 1000 / (R * TEMP[i]))
         f1.write(str(TEMP[i]))
         f1.write('\t\t')
         f1.write(str(RRC))
@@ -287,7 +292,8 @@ def main():
         for i in range(0, NT):
             PRED = X[0] * TEMP[i] * TEMP[i] + X[1] * TEMP[i] + X[2]
             FRC = RCC * (TEMP[i] ** NN) * numpy.exp(-PRED / (R * TEMP[i]))
-            RRC = RCC * (TEMP[i] ** NN) * numpy.exp(-GDAT[i] * 1000 / (R * TEMP[i]))
+            RRC = RCC * (TEMP[i] ** NN) * \
+                numpy.exp(-GDAT[i] * 1000 / (R * TEMP[i]))
             TF = (C1 * TV[i] / TEMP[i]) ** 2.0
             TF = TF * (1.0 + R * TEMP[i] / (EZT[i] * 1000.0)) / 24.0
             TF = TF + 1.0
@@ -301,7 +307,6 @@ def main():
             f1.write('\n')
             f2.write(str(RRC))
             f2.write('\n')
-    print(X)
     f.close()
     f1.close()
     f2.close()
@@ -350,7 +355,7 @@ def GIBBS(NT, TEMP, L, SPECIES, WT, G0, G1, EE, BE, AE, WE, WEX, SN, SF, A, B, C
             else:
                 E0 = -U / 2
             G = CTRANS - numpy.log(SN * Y) + Y / 3 + Y ** 2 / 90 - numpy.log(1 - numpy.exp(-U)) + CELECT + E0 + (
-                    2 * XE * U1) + D / EU + 8 * GG / U
+                2 * XE * U1) + D / EU + 8 * GG / U
             G = G * R * T
             E0 = E0 * R * T
         # Polyatomic Species
@@ -373,7 +378,8 @@ def GIBBS(NT, TEMP, L, SPECIES, WT, G0, G1, EE, BE, AE, WE, WEX, SN, SF, A, B, C
                     FR = math.log(SF * YY)
                 else:
                     FR = 0.5 * math.log(math.pow(SF, 2) * math.pow(YY, 3) / PI)
-            G = CTRANS - FR - math.log(SN * Y) + Y / 3 + math.pow(Y, 2) / 90 + CVIB + CELECT
+            G = CTRANS - FR - math.log(SN * Y) + Y / \
+                3 + math.pow(Y, 2) / 90 + CVIB + CELECT
             G = G * R * T
             E0 = E0 * R * T
             # nonlinear Species
@@ -389,7 +395,8 @@ def GIBBS(NT, TEMP, L, SPECIES, WT, G0, G1, EE, BE, AE, WE, WEX, SN, SF, A, B, C
                     FR = math.log(SF * YY)
                 else:
                     FR = 0.5 * math.log(math.pow(SF, 2) * math.pow(YY, 3) / PI)
-            G = CTRANS - FR - 0.5 * math.log(math.pow(SN, 2) * Y / PI) + CVIB + CELECT
+            G = CTRANS - FR - 0.5 * \
+                math.log(math.pow(SN, 2) * Y / PI) + CVIB + CELECT
             G = G * R * T
             E0 = E0 * R * T
 
@@ -398,40 +405,43 @@ def GIBBS(NT, TEMP, L, SPECIES, WT, G0, G1, EE, BE, AE, WE, WEX, SN, SF, A, B, C
     DGT.append(dgt1)
 
 
-def HOUSEFIT(A, M, N, B, K, L, X, W, ISING):
-    # (AA, NT, 3, BB, NT, 1, X, WW, ISING)
-    HOUSETRANS(A, M, N, B, K, L, W, ISING)
-    BACKSUB(A, M, N, B, K, L, X)
-    pass
-
-
-def HOUSETRANS(A, M, N, B, KB, LB, W, ISING):
-    # pass
+def HOUSEFIT(A, M, N, B, K, L, X, W):
+    HOUSETRANS(A, M, N, B, K, L, W)
+    # BACKSUB(A, M, N, B, K, L, X)
+def HOUSETRANS(A, M, N, B, KB, LB, W):
     for K in range(0, N):
-        MX = idamax(M - K + 1, A[K][K], 1) + K - 1
+        MX = idamax(M - K, numpy.transpose(A)[K], 1) + K
         RMS = 0.0
         I = K
-        while I <= M:
-            W[I] = A[I][K] / abs(A[MX][K])
-            RMS = RMS + W[I] * W[I]
+        temp = []
+        for i in range(0,M):
+            temp.append(0)
+        while I < M:
+            temp[I] = numpy.transpose(A)[K][I] / abs(numpy.transpose(A)[K][MX])
+            RMS = RMS + temp[I] * temp[I]
             I += 1
         RMS = math.sqrt(RMS)
-        BK = 1 / (RMS * (RMS + abs(W[K])))
-        ZZ = W[K]
-        W[K] = W[K] + numpy.sign(RMS, ZZ)
-        J = 1
-        while J <= N:
-            S = ddot(M - K + 1, W[K], 1, A[K][J], 1)
+        BK = 1 / (RMS * (RMS + abs(temp[K])))
+        temp[K] = temp[K] + RMS
+        new_temp = []
+        for i in range(0,len(temp)):
+            if(temp[i] != 0):
+                new_temp.append(temp[i])
+        W.append(new_temp)
+        for J in range(0,N):
+            temp1 = []
+            for i in range(0,len(numpy.transpose(A)[J])):
+                if(i >= K):
+                    temp1.append(numpy.transpose(A)[J][i])
+            S = ddot(M - K, W[K], 1, temp1, 1)
             S = BK * S
-            daxpy(M - K + 1, -S, W[K], 1, A[K][J], 1)
-            J += 1
-        J = 1
-        while J <= LB:
-            S = ddot(M - K + 1, W[K], 1, B[K][J], 1)
-            S = BK * S
-            daxpy(M - K + 1, -S, W[K], 1, B[K][J], 1)
-            J += 1
-
+            print(S)
+            daxpy(M - K, -S, W[K], 1, temp1, 1)
+            
+        # for J in range(0,LB):
+        #     S = ddot(M - K + 1, W[K], 1, B[K][J], 1)
+        #     S = BK * S
+        #     daxpy(M - K + 1, -S, W[K], 1, B[K][J], 1)
 
 def BACKSUB(A, M, N, B, KB, LB, X):
     dcopy(KB * LB, B, 1, X, 1)
@@ -440,114 +450,46 @@ def BACKSUB(A, M, N, B, KB, LB, X):
         J = N
         while J >= 2:
             X[J] = X[J] / A[J]
-            daxpy(J - 1, -X[J], A[1][J], 1, X[1], 1)
+            daxpy(J - 1, -X[J], A[1][J], 1, X[1][L], 1)
             J -= 1
-        X[1] = X[1] / A[1][1]
-
-
-def dswap(n, dx, incx, dy, incy):
-    if incx == 1 and incy == 1:
-        for i in range(0, n):
-            s = dx[i]
-            dx[i] = dy[i]
-            dy[i] = s
-    else:
-        ix = 0
-        iy = 0
-        for i in range(0, n):
-            s = dx[ix]
-            dx[ix] = dy[iy]
-            dy[iy] = s
-            ix = ix + incx
-            iy = iy + incy
+        X[1][L] = X[1][L] / A[1][1]
 
 
 def ddot(n, dx, incx, dy, incy):
     s = 0
-    if incx == 1 and incy == 1:
-        for i in range(0, n):
-            s += dx[i] * dy[i]
-    else:
-        ix = 0
-        iy = 0
-        for i in range(0, n):
-            s += dx[ix] * dy[iy]
-            ix = ix + incx
-            iy = iy + incy
+    for i in range(0, n):
+        s = s + dx[i] * dy[i]
     return s
 
+def idamax(n, dx, incx):
+    ii = 0
+    xmax = abs(dx[0])
+    for i in range(0, n):
+        if abs(dx[i]) > xmax:
+            xmax = abs(dx[i])
+            ii = i + 1
+    return ii
 
 def daxpy(n, da, dx, incx, dy, incy):
-    if incx == 1 and incy == 1:
-        for i in range(0, n):
-            dy[i] = dy[i] + da * dx[i]
-    else:
-        ix = 0
-        iy = 0
-        for i in range(0, n):
-            dy[iy] = dy[iy] + da * dx[ix]
-            iy = iy + incy
-            ix = ix + incx
-
-
-def dscal(n, da, dx, incx):
-    if incx == 1:
-        for i in range(0, n):
-            dx[i] = da * dx[i]
-    else:
-        ix = 0
-        for i in range(0, n):
-            dx[i] = da * dx[i]
-            ix = ix + incx
+    for i in range(0, n):
+        dy[i] = dy[i] + da * dx[i]
+        print(dx[i])
 
 
 def idamax(n, dx, incx):
     ii = 1
     xmax = abs(dx[1])
     if incx == 1:
-        for i in range(0, n):
+        for i in range(2, n):
             if abs(dx[i]) > xmax:
                 xmax = abs(dx[i])
-                ii = i
-    else:
-        ix = 0
-        for i in range(0, n):
-            ix = ix + incx
-            if abs(dx[ix]) > xmax:
-                xmax = abs(dx[ix])
                 ii = i
     return ii
 
 
 def dcopy(n, dx, incx, dy, incy):
-    if incx == 1 and incy == 1:
-        for i in range(0, n):
-            dy[i] = dx[i]
-    else:
-        ix = 1
-        iy = 1
-        for i in range(0, n):
-            dy[iy] = dx[ix]
-            iy = iy + incy
-            ix = ix + incx
-
-
-def drot(n, dx, incx, dy, incy, c, s):
-    if abs(c) > abs(s):
-        c1 = c
-        s1 = s
-        s2 = -s1 / c1
-        c2 = c1 - s2 * s1
-    else:
-        c1 = s
-        s1 = c
-        dswap(n, dx, incx, dy, incy)
-        s2 = s1 / c1
-        c2 = -s2 * s1 - c1
-    dscal(n, c1, dx, incx)
-    daxpy(n, s1, dy, incy, dx, incx)
-    dscal(n, c2, dy, incy)
-    daxpy(n, s2, dx, incx, dy, incy)
+    for i in range(0, n):
+        dy[i] = dx[i]
 
 
 if __name__ == "__main__":

@@ -165,6 +165,7 @@ if __name__ == "__main__":
       os.mkdir(duongdan + '\output')
       
     # run file ke
+    inputfile.inputfile()
     file1 = open('input//ke_input.txt', 'r')
     outputfile = open('output//output_ke.csv', 'w+', encoding='UTF8', newline='')
     energyfile = open('output//energy.csv', 'w+', encoding='UTF8', newline='')
