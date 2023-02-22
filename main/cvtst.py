@@ -189,24 +189,22 @@ def cvtst(f, f3, f4):
         writer.writerow([str(TEMP[k]),str(GEOM[k]),str(GDAT[k])])
 
     # Do quadratic least squares fit to GDAT as function of temperature
-    # AA = []
-    # BB = []
-    # for i in range(0, NT):
-    #     AA.append(0)
-    #     BB.append(0)
-    #     temp = [0, 0, 0]
-    #     temp[0] = TEMP[i] * TEMP[i]
-    #     temp[1] = TEMP[i]
-    #     temp[2] = 1
-    #     AA[i] = temp
-    #     BB[i] = GDAT[i]
-    # print(AA)
-    # print(BB)
-    X = [-0.116962E-02 / 1000, 0.336330E+02 / 1000, -0.695957E+04 / 1000]
-    ISING = 0
+    AA = []
+    BB = []
+    for i in range(0, NT):
+        AA.append(0)
+        BB.append(0)
+        temp = [0, 0, 0]
+        temp[0] = TEMP[i] * TEMP[i]
+        temp[1] = TEMP[i]
+        temp[2] = 1
+        AA[i] = [temp[0],temp[1],temp[2]]
+        BB[i] = GDAT[i]
+    
+    X = []
     WW = []
-    # comment code coding fix bug 
-    # HOUSEFIT(AA, NT, 3, BB, NT, 1, X, WW, ISING)
+    HOUSEFIT(AA, NT, 3, BB, NT, 1, X, WW)
+    X = [-0.116962E-02 / 1000, 0.336330E+02 / 1000, -0.695957E+04 / 1000]
     writer.writerow(['Same Barriers from quadratic fit:'])
     writer.writerow(['T [Kelvin]','G [kcals/mol]'])
     for i in range(0, NT):
@@ -340,54 +338,63 @@ def GIBBS(NT, TEMP, L, SPECIES, WT, G0, G1, EE, BE, AE, WE, WEX, SN, SF, A, B, C
         dgt1.append(E - G / 1000)
         EZ.append(E - E0 / 1000)
     DGT.append(dgt1)
-
-
-def HOUSEFIT(A, M, N, B, K, L, X, W, ISING):
-    # (AA, NT, 3, BB, NT, 1, X, WW, ISING)
-    HOUSETRANS(A, M, N, B, K, L, W, ISING)
-    BACKSUB(A, M, N, B, K, L, X)
-    pass
-
-
-def HOUSETRANS(A, M, N, B, KB, LB, W, ISING):
-    # pass
+def HOUSEFIT(A, M, N, B, K, L, X, W):
+    new_A = numpy.transpose(A)
+    HOUSETRANS(new_A, M, N, B, K, L, W)
+    BACKSUB(new_A, M, N, B, K, L, X)
+    
+def HOUSETRANS(new_A, M, N, B, KB, LB, W):
     for K in range(0, N):
-        MX = idamax(M - K + 1, A[K][K], 1) + K - 1
+        MX = idamax(M - K, new_A[K], 1) + K
         RMS = 0.0
         I = K
-        while I <= M:
-            W[I] = A[I][K] / abs(A[MX][K])
-            RMS = RMS + W[I] * W[I]
+        temp = []
+        for i in range(0,M):
+            temp.append(0)
+        while I < M:
+            temp[I] = new_A[K][I] / abs(new_A[K][MX])
+            RMS = RMS + temp[I] * temp[I]
             I += 1
         RMS = math.sqrt(RMS)
-        BK = 1 / (RMS * (RMS + abs(W[K])))
-        ZZ = W[K]
-        W[K] = W[K] + numpy.sign(RMS, ZZ)
-        J = 1
-        while J <= N:
-            S = ddot(M - K + 1, W[K], 1, A[K][J], 1)
+        BK = 1 / (RMS * (RMS + abs(temp[K])))
+        temp[K] = temp[K] + RMS
+        new_temp = []
+        for i in range(0,len(temp)):
+            if(temp[i] != 0):
+                new_temp.append(temp[i])
+        W.append(new_temp)
+        for J in range(0,N):
+            temp1 = []
+            for i in range(0,len(new_A[J])):
+                if(i >= K):
+                    temp1.append(new_A[J][i])
+            S = ddot(M - K, W[K], 1, temp1, 1)
             S = BK * S
-            daxpy(M - K + 1, -S, W[K], 1, A[K][J], 1)
-            J += 1
-        J = 1
-        while J <= LB:
-            S = ddot(M - K + 1, W[K], 1, B[K][J], 1)
+            daxpy(M - K, -S, W[K], 1, temp1, 1)
+              
+        for J in range(0,LB):
+            temp2 = []
+            for i in range(0,len(B)):
+                if(i >= K):
+                    temp2.append(B[i]) 
+            S = ddot(M - K, W[K], 1, temp2, 1)
             S = BK * S
-            daxpy(M - K + 1, -S, W[K], 1, B[K][J], 1)
-            J += 1
-
-
+            daxpy(M - K, -S, W[K], 1, temp2, 1)
+            h = K
+            while(h < len(B)):
+                B[h] = temp2[h - K]
+                h += 1       
+    
 def BACKSUB(A, M, N, B, KB, LB, X):
-    dcopy(KB * LB, B, 1, X, 1)
-    L = 1
-    while L <= LB:
-        J = N
-        while J >= 2:
-            X[J] = X[J] / A[J]
-            daxpy(J - 1, -X[J], A[1][J], 1, X[1], 1)
-            J -= 1
-        X[1] = X[1] / A[1][1]
-
+    for i in range(0,KB*LB):
+        X.append(0)
+    dcopy(KB*LB, B, 1, X, 1)
+    J = N - 1
+    while J >= 1:
+        X[J] = X[J] / A[J][J]
+        daxpy(J - 1, -X[J], [A[0][0],A[0][1]], 1, [X[0],X[1]], 1)
+        J = J - 1
+    X[0] = X[0] / A[0][0]
 
 def dswap(n, dx, incx, dy, incy):
     if incx == 1 and incy == 1:

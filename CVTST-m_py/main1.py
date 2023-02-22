@@ -434,27 +434,20 @@ def HOUSETRANS(new_A, M, N, B, KB, LB, W):
                     temp1.append(new_A[J][i])
             S = ddot(M - K, W[K], 1, temp1, 1)
             S = BK * S
-            print(S)
-            print(temp1)
-            print(W[K])
             daxpy(M - K, -S, W[K], 1, temp1, 1)
-            print('sau khi chạy')
-            print(temp1)
-            # for i in len(temp1):
-            #   new_A[J][i + J] = temp1[i]
               
-        # for J in range(0,LB):
-        #     temp2 = []
-        #     for i in range(0,len(B)):
-        #         if(i >= K):
-        #             temp2.append(B[i]) 
-        #     S = ddot(M - K, W[K], 1, temp2, 1)
-        #     S = BK * S
-        #     daxpy(M - K, -S, W[K], 1, temp2, 1)
-        #     h = K
-        #     while(h < len(B)):
-        #         B[h] = temp2[h - K]
-        #         h += 1       
+        for J in range(0,LB):
+            temp2 = []
+            for i in range(0,len(B)):
+                if(i >= K):
+                    temp2.append(B[i]) 
+            S = ddot(M - K, W[K], 1, temp2, 1)
+            S = BK * S
+            daxpy(M - K, -S, W[K], 1, temp2, 1)
+            h = K
+            while(h < len(B)):
+                B[h] = temp2[h - K]
+                h += 1       
     
 def BACKSUB(A, M, N, B, KB, LB, X):
     for i in range(0,KB*LB):

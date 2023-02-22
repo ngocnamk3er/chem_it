@@ -208,8 +208,6 @@ def main():
     # Do quadratic least squares fit to GDAT as function of temperature
     AA = []
     BB = []
-    # for i in range(0, 3*NT):
-    #     AA.append(0)
     for i in range(0, NT):
         AA.append(0)
         BB.append(0)
@@ -217,9 +215,6 @@ def main():
         temp[0] = TEMP[i] * TEMP[i]
         temp[1] = TEMP[i]
         temp[2] = 1
-        # AA[i] = TEMP[i] * TEMP[i]
-        # AA[i + NT] = TEMP[i]
-        # AA[i + 2*NT] = 1
         AA[i] = [temp[0],temp[1],temp[2]]
         BB[i] = GDAT[i]
     
