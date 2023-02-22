@@ -403,21 +403,20 @@ def GIBBS(NT, TEMP, L, SPECIES, WT, G0, G1, EE, BE, AE, WE, WEX, SN, SF, A, B, C
         EZ.append(E - E0 / 1000)
     DGT.append(dgt1)
 
-
 def HOUSEFIT(A, M, N, B, K, L, X, W):
-    pass
-    #HOUSETRANS(A, M, N, B, K, L, W)
-    #BACKSUB(A, M, N, B, K, L, X)
-def HOUSETRANS(A, M, N, B, KB, LB, W):
+    new_A = numpy.transpose(A)
+    HOUSETRANS(new_A, M, N, B, K, L, W)
+    BACKSUB(new_A, M, N, B, K, L, X)
+def HOUSETRANS(new_A, M, N, B, KB, LB, W):
     for K in range(0, N):
-        MX = idamax(M - K, numpy.transpose(A)[K], 1) + K
+        MX = idamax(M - K, new_A[K], 1) + K
         RMS = 0.0
         I = K
         temp = []
         for i in range(0,M):
             temp.append(0)
         while I < M:
-            temp[I] = numpy.transpose(A)[K][I] / abs(numpy.transpose(A)[K][MX])
+            temp[I] = new_A[K][I] / abs(new_A[K][MX])
             RMS = RMS + temp[I] * temp[I]
             I += 1
         RMS = math.sqrt(RMS)
@@ -430,38 +429,43 @@ def HOUSETRANS(A, M, N, B, KB, LB, W):
         W.append(new_temp)
         for J in range(0,N):
             temp1 = []
-            for i in range(0,len(numpy.transpose(A)[J])):
+            for i in range(0,len(new_A[J])):
                 if(i >= K):
-                    temp1.append(numpy.transpose(A)[J][i])
+                    temp1.append(new_A[J][i])
             S = ddot(M - K, W[K], 1, temp1, 1)
             S = BK * S
-            #daxpy(M - K, -S, W[K], 1, temp1, 1)
-        for J in range(0,LB):
-            temp2 = []
-            for i in range(0,len(B)):
-                if(i >= K):
-                    temp2.append(B[i]) 
-            S = ddot(M - K, W[K], 1, temp2, 1)
-            S = BK * S
-            daxpy(M - K, -S, W[K], 1, temp2, 1)
-            h = K
-            while(h < len(B)):
-                B[h] = temp2[h - K]
-                h += 1       
+            print(S)
+            print(temp1)
+            print(W[K])
+            daxpy(M - K, -S, W[K], 1, temp1, 1)
+            print('sau khi chạy')
+            print(temp1)
+            # for i in len(temp1):
+            #   new_A[J][i + J] = temp1[i]
+              
+        # for J in range(0,LB):
+        #     temp2 = []
+        #     for i in range(0,len(B)):
+        #         if(i >= K):
+        #             temp2.append(B[i]) 
+        #     S = ddot(M - K, W[K], 1, temp2, 1)
+        #     S = BK * S
+        #     daxpy(M - K, -S, W[K], 1, temp2, 1)
+        #     h = K
+        #     while(h < len(B)):
+        #         B[h] = temp2[h - K]
+        #         h += 1       
     
 def BACKSUB(A, M, N, B, KB, LB, X):
-    new_A = numpy.transpose(A)
     for i in range(0,KB*LB):
         X.append(0)
     dcopy(KB*LB, B, 1, X, 1)
-    print(X)
     J = N - 1
     while J >= 1:
-        X[J] = X[J] / new_A[J][J]
-        print(X[J])
-        #daxpy(J - 1, -X[J], A[1][J], 1, X[1][L], 1)
+        X[J] = X[J] / A[J][J]
+        daxpy(J - 1, -X[J], [A[0][0],A[0][1]], 1, [X[0],X[1]], 1)
         J = J - 1
-        # X[1][L] = X[1][L] / A[1][1]
+    X[0] = X[0] / A[0][0]
 
 
 def ddot(n, dx, incx, dy, incy):
@@ -482,7 +486,7 @@ def idamax(n, dx, incx):
 def daxpy(n, da, dx, incx, dy, incy):
     for i in range(0, n):
         dy[i] = dy[i] + da * dx[i]
-
+        
 def idamax(n, dx, incx):
     ii = 1
     xmax = abs(dx[1])
