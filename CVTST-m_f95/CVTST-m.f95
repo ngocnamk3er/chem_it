@@ -182,7 +182,6 @@
          AA(I+NT) = TEMP(I)
          AA(I+(2*NT)) = 1.0D0
          BB(I) = GDAT(I)
-         !WRITE(6,*) AA(I), AA(I + NT), AA(I + 2*NT)
   100 CONTINUE
 
       CALL HOUSEFIT (AA,NT,3,BB,NT,1,X,WW,ISING)
@@ -431,7 +430,6 @@
       ISING=0
       DO 300 K=1,N
          MX=IDAMAX(M-K+1,A(K,K),1) + K-1
-         write(6,*) MX
          IF(A(MX,K).EQ.0) ISING=K
 !                   i.e. A is a singular matrix; Kth column became zero.
 !         IF(A(MX,K).EQ.0) THEN
@@ -575,8 +573,7 @@
          ii=1
          xmax=abs(dx(1)) 
       if(incx.eq.1) then
-         do 100 i=2
-           WRITE(6,*) abs(dx(i)),n
+         do 100 i=2,n
            if (abs(dx(i)).gt.xmax) then
                xmax=abs(dx(i))
                ii=i
