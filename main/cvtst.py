@@ -146,7 +146,7 @@ def cvtst(f, f3, f4):
     while i < NP:
         writer.writerow([str(GEO[i])])
         i += 1
-    # dG/dR\
+    # dG/dR
     GDAT = []
     TV = []
     EZT = []
@@ -179,7 +179,6 @@ def cvtst(f, f3, f4):
             else:
                 dGdRA = (GG[j] - GG[j - 1]) / (GEO[j + 1] - GEO[j])
                 dGdRB = (GG[j - 1] - GG[j - 1 - 1]) / (GEO[j] - GEO[j - 1])
-                # dGdR.append((dGdRA + dGdRB) / 2)
                 writer.writerow([str(GEO[j]),str(GG[j - 1]),str((dGdRA + dGdRB) / 2)])
             j += 1
     writer.writerow(['Greatest Gibbs Free-Energy Barriers [kcals/mol]'])
@@ -339,47 +338,49 @@ def GIBBS(NT, TEMP, L, SPECIES, WT, G0, G1, EE, BE, AE, WE, WEX, SN, SF, A, B, C
         EZ.append(E - E0 / 1000)
     DGT.append(dgt1)
 def HOUSEFIT(A, M, N, B, K, L, X, W):
-    new_A = numpy.transpose(A)
+    new_A = numpy.transpose(A).astype(numpy.float32)
     HOUSETRANS(new_A, M, N, B, K, L, W)
     BACKSUB(new_A, M, N, B, K, L, X)
-    
 def HOUSETRANS(new_A, M, N, B, KB, LB, W):
+    for i in range(0,M):
+        W.append(0)
     for K in range(0, N):
         MX = idamax(M - K, new_A[K], 1) + K
         RMS = 0.0
         I = K
-        temp = []
-        for i in range(0,M):
-            temp.append(0)
         while I < M:
-            temp[I] = new_A[K][I] / abs(new_A[K][MX])
-            RMS = RMS + temp[I] * temp[I]
+            W[I] = new_A[K][I] / abs(new_A[K][MX])
+            RMS = RMS + W[I] * W[I]
             I += 1
         RMS = math.sqrt(RMS)
-        BK = 1 / (RMS * (RMS + abs(temp[K])))
-        temp[K] = temp[K] + RMS
-        new_temp = []
-        for i in range(0,len(temp)):
-            if(temp[i] != 0):
-                new_temp.append(temp[i])
-        W.append(new_temp)
+        BK = 1 / (RMS * (RMS + abs(W[K])))
+        W[K] = W[K] + RMS
         for J in range(0,N):
             temp1 = []
             for i in range(0,len(new_A[J])):
                 if(i >= K):
                     temp1.append(new_A[J][i])
-            S = ddot(M - K, W[K], 1, temp1, 1)
+            temp = []
+            for i in range(0,len(W) - K):
+                temp.append(W[i + K])
+            S = ddot(M - K, temp, 1, temp1, 1)
             S = BK * S
-            daxpy(M - K, -S, W[K], 1, temp1, 1)
+            daxpy(M - K, -S, temp, 1, temp1, 1)
+            h = J
+            while(h < len(new_A[J])):
+                new_A[J][h] = temp1[h - K]
+                h += 1
               
         for J in range(0,LB):
             temp2 = []
+            for i in range(0,len(W) - K):
+                temp.append(W[i + K])
             for i in range(0,len(B)):
                 if(i >= K):
                     temp2.append(B[i]) 
-            S = ddot(M - K, W[K], 1, temp2, 1)
+            S = ddot(M - K, temp, 1, temp2, 1)
             S = BK * S
-            daxpy(M - K, -S, W[K], 1, temp2, 1)
+            daxpy(M - K, -S, temp, 1, temp2, 1)
             h = K
             while(h < len(B)):
                 B[h] = temp2[h - K]
